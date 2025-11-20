@@ -1,0 +1,15 @@
+.modal .modal-body .modal-profile {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}
+
+.form-edit .profile-edit {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}
+
+.navbar .navbar-nav .img-profile {
+    object-fit: cover;
+}
