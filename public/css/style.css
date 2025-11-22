@@ -13,3 +13,25 @@
 .navbar .navbar-nav .img-profile {
     object-fit: cover;
 }
+
+/* Ini Style Untuk Side Bar */
+.sidebar {
+    background-color: #333333;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link:hover i {
+    color: #ffb22c !important;
+}
+
+.sidebar .nav-link,
+.sidebar .nav-link i {
+    color: #ffffff !important;
+}
+
+.sidebar .nav-item .nav-link.active {
+    color: #ffb22c !important;
+}
+.sidebar .nav-item .nav-link.active i {
+    color: #ffb22c !important;
+}
