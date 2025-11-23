@@ -91,6 +91,6 @@
             @enderror
         </div>
 
-        <button type="submit" class="btn btn-primary">Ubah</button>
+        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
     </form>
 @endsection

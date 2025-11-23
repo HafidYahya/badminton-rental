@@ -39,6 +39,7 @@ class UserManagementController extends Controller
             'password.max' => 'Password maksimal 100 karakter',
             'konfirmasi_password.same' => 'Password tidak cocok',
             'foto_profile.mimes' => 'Format file harus JPG, JPEG, PNG, WEBP, atau HEIC',
+            'foto_profile.max' => 'Maksimal Size 2 MB',
         ]);
 
         // Validasi apakah ada foto yang di upload

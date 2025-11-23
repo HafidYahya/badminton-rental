@@ -4,10 +4,10 @@
         class="sidebar-brand d-flex align-items-center justify-content-center"
         href="{{ route("dashboard") }}"
     >
-        <div class="sidebar-brand-icon rotate-n-15">
-            <i class="fas fa-laugh-wink"></i>
+        <div class="sidebar-brand-icon rotate-n-10">
+            <i class="fa-solid fa-magnifying-glass-chart"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">Badminton</div>
+        <div class="sidebar-brand-text mx-3">BADMINTON</div>
     </a>
 
     <!-- Divider -->
@@ -21,6 +21,23 @@
         >
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span>
+        </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider" />
+
+    <!-- Heading -->
+    <div class="sidebar-heading">Master</div>
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    <li class="nav-item">
+        <a
+            class="nav-link {{ Route::is("lapangan.*") ? "active" : "" }}"
+            href="{{ route("lapangan.index") }}"
+        >
+            <i class="fa-solid fa-font-awesome"></i>
+            <span>Lapangan</span>
         </a>
     </li>
 

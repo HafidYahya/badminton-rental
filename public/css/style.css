@@ -3,10 +3,18 @@
     height: 120px;
     object-fit: cover;
 }
+.modal .modal-body .modal-lapangan {
+    width: 100%;
+    object-fit: cover;
+}
 
 .form-edit .profile-edit {
     width: 120px;
     height: 120px;
+    object-fit: cover;
+}
+.form-edit-lapangan .foto-lapangan {
+    width: 50%;
     object-fit: cover;
 }
 
@@ -34,4 +42,8 @@
 }
 .sidebar .nav-item .nav-link.active i {
     color: #ffb22c !important;
+}
+
+.sidebar-divider {
+    background-color: #777777 !important;
 }

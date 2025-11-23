@@ -31,6 +31,10 @@
 
         {{-- Custome CSS --}}
         <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+        {{-- Font Awesome --}}
+        <link rel="stylesheet" href="{{ asset('fontawesome/css/all.min.css') }}">
+        
     </head>
 
     <body id="page-top">
@@ -85,6 +89,18 @@
         <!-- Page level custom scripts -->
         <script src="{{ asset("templates/js/demo/chart-area-demo.js") }}"></script>
         <script src="{{ asset("templates/js/demo/chart-pie-demo.js") }}"></script>
+        {{-- TYNYMCE --}}
+        <script src="{{ asset('tinymce/js/tinymce/tinymce.min.js') }}"></script>
+        <script>
+            tinymce.init({
+                selector: '#deskripsi',
+                height: 400,
+                plugins: 'lists',
+                toolbar: 'bold italic underline | bullist numlist | alignleft aligncenter alignright | undo redo',
+                menubar: false,
+                license_key: 'gpl'
+            });
+        </script>
         {{-- CUSTOME JS --}}
         @stack('scripts')
     </body>
