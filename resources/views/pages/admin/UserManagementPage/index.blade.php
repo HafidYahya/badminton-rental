@@ -11,54 +11,58 @@
             Tambah Pengguna
         </a>
     </div>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">No</th>
-                <th scope="col">Username</th>
-                <th scope="col">Nama Lengkap</th>
-                <th scope="col">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($users as $user)
+    <div class="table-responsive">
+        <table class="table table-striped text-nowrap">
+            <thead>
                 <tr>
-                    <td scope="row">{{ $loop->iteration }}</td>
-                    <td>{{ $user->u_username }}</td>
-                    <td>{{ $user->u_nama_lengkap }}</td>
-                    <td>
-                        <button
-                            type="button"
-                            class="btn btn-secondary btn-sm"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalDetail{{ $user->u_id }}"
-                        >
-                            <i class="fa fa-fw fa-eye"></i>
-                        </button>
-                        <a
-                            href="{{ route("user.edit", $user->u_id) }}"
-                            class="btn btn-success btn-sm"
-                        >
-                            <i class="fa fa-fw fa-edit"></i>
-                            Edit
-                        </a>
-                        <button
-                            class="btn btn-danger btn-sm"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalDelete{{ $user->u_id }}"
-                        >
-                            <i class="fa fa-fw fa-trash"></i>
-                            Hapus
-                        </button>
-                    </td>
+                    <th scope="col">No</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Nama Lengkap</th>
+                    <th scope="col">Aksi</th>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="4" class="text-center">Belum ada data user</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @forelse ($users as $user)
+                    <tr>
+                        <td scope="row">{{ $loop->iteration }}</td>
+                        <td>{{ $user->u_username }}</td>
+                        <td>{{ $user->u_nama_lengkap }}</td>
+                        <td>
+                            <button
+                                type="button"
+                                class="btn btn-secondary btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalDetail{{ $user->u_id }}"
+                            >
+                                <i class="fa fa-fw fa-eye"></i>
+                            </button>
+                            <a
+                                href="{{ route("user.edit", $user->u_id) }}"
+                                class="btn btn-success btn-sm"
+                            >
+                                <i class="fa fa-fw fa-edit"></i>
+                                Edit
+                            </a>
+                            <button
+                                class="btn btn-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalDelete{{ $user->u_id }}"
+                            >
+                                <i class="fa fa-fw fa-trash"></i>
+                                Hapus
+                            </button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            Belum ada data user
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
     @foreach ($users as $user)
         <!-- MODAL DETAIL UNTUK MENAMPILKAN DETAIL USER-->
         <div

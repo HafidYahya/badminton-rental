@@ -24,10 +24,18 @@
                     <div
                         class="form-login-admin bg-white border border-white bg-opacity-50 col-lg-6 col-md-8 col-sm-12 p-4"
                     >
-                        <h2 class="text-center fw-bold">LOGIN</h2>
+                        <h3 class="card-title text-start fw-bold mb-2">
+                            Selamat Datang
+                            <i class="fa-solid fa-hands-clapping"></i>
+                        </h3>
+                        <p class="text-secondary text-start mb 3">
+                            Silahkan login terlebih dahulu dan lanjutkan
+                            pemesanan anda
+                        </p>
+                        <hr />
                         <form
                             method="POST"
-                            action="{{ route("login.admin") }}"
+                            action="{{ route("login.customer") }}"
                         >
                             @csrf
                             <div class="mb-3">

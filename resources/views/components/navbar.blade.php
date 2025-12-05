@@ -20,12 +20,12 @@
             >
                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
                     @auth
-                        {{ Auth::user()->u_nama_lengkap }}
+                        {{ Auth::guard("web")->user()->u_nama_lengkap }}
                     @endauth
                 </span>
                 <img
                     class="img-profile rounded-circle"
-                    src="{{ asset("uploads/users/" . Auth::user()->u_foto_profile) }}"
+                    src="{{ asset("uploads/users/" . Auth::guard("web")->user()->u_foto_profile) }}"
                 />
             </a>
             <!-- Dropdown - User Information -->
@@ -35,13 +35,13 @@
             >
                 <a
                     class="dropdown-item"
-                    href="{{ route("user.edit", Auth::user()->u_id) }}"
+                    href="{{ route("user.edit", Auth::guard("web")->user()->u_id) }}"
                 >
                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                     Pengaturan Profil
                 </a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{{ "/logout" }}">
+                <a class="dropdown-item" href="{{ route("logout") }}">
                     <i
                         class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"
                     ></i>

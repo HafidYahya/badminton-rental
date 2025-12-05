@@ -7,20 +7,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class Authenticate
+class AdminAuth
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+     public function handle(Request $request, Closure $next)
     {
-        if(!Auth::check()){
-            return redirect()->route('login.admin.form');
+        if (!Auth::guard('web')->check()) {
+            return redirect()->route('login');
         }
-        
-        return $next($request);
 
+        return $next($request);
     }
 }
