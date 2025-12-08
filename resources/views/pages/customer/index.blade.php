@@ -80,18 +80,30 @@
                                     Harga: Rp
                                     {{ number_format($lp->l_harga, 0, ",", ".") }}/jam
                                 </p>
-                                @if ($lp->l_status === "active")
-                                    <a href="" class="btn btn-primary mt-auto">
-                                        Pesan Sekarang
-                                    </a>
+                                @auth("customer")
+                                    @if ($lp->l_status === "active")
+                                        <a
+                                            href=""
+                                            class="btn btn-primary mt-auto"
+                                        >
+                                            Pesan Sekarang
+                                        </a>
+                                    @else
+                                        <a
+                                            href=""
+                                            class="btn btn-secondary mt-auto disabled"
+                                        >
+                                            Pesan Sekarang
+                                        </a>
+                                    @endif
                                 @else
                                     <a
-                                        href=""
-                                        class="btn btn-secondary mt-auto disabled"
+                                        href="{{ route("login.customer") }}"
+                                        class="btn btn-primary mt-auto"
                                     >
                                         Pesan Sekarang
                                     </a>
-                                @endif
+                                @endauth
                             </div>
                         </div>
                     </div>

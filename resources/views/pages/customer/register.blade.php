@@ -41,6 +41,11 @@
 
     <body class="register-bg">
         {{-- CONTENT --}}
+        @if (Auth::guard("customer")->check())
+            @include("components.navbar-customer-after-login")
+        @else
+            @include("components.navbar-customer-before-login")
+        @endif
         <div
             class="container d-flex justify-content-center min-vh-100 py-5 align-items-md-center"
         >
@@ -197,7 +202,7 @@
                             <div class="form-text mt-2 text-center">
                                 Sudah punya akun?
                                 <a
-                                    href=""
+                                    href="{{ route("login.customer.form") }}"
                                     class="text-primary fw-bold link-underline link-underline-opacity-0"
                                 >
                                     Login

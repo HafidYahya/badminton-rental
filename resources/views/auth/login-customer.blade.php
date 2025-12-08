@@ -4,13 +4,30 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        @vite(["resources/sass/app.scss", "resources/js/app.js"])
+        <!-- Custom styles for this template-->
+        <link
+            href="{{ asset("templates/css/sb-admin-2.min.css") }}"
+            rel="stylesheet"
+        />
+        @vite(["resources/css/app.css", "resources/js/app.js"])
+
+        {{-- Custome CSS --}}
         <link rel="stylesheet" href="{{ asset("css/style.css") }}" />
+        {{-- Font Awesome --}}
+        <link
+            rel="stylesheet"
+            href="{{ asset("fontawesome/css/all.min.css") }}"
+        />
 
         <title>Login</title>
     </head>
     <body class="bg-admin-login">
-        <div class="container py-5">
+        @if (Auth::guard("customer")->check())
+            @include("components.navbar-customer-after-login")
+        @else
+            @include("components.navbar-customer-before-login")
+        @endif
+        <div class="container py-5 my-5">
             <div class="card p-0 overflow-hidden border border-white">
                 <div class="row align-items-center g-0">
                     <div class="col-lg-6 d-none d-lg-block">
