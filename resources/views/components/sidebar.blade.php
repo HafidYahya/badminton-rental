@@ -64,6 +64,15 @@
             <span>Jam Operasional</span>
         </a>
     </li>
+    <li class="nav-item">
+        <a
+            class="nav-link {{ Route::is("hari.libur.index") ? "active" : "" }}"
+            href="/hari-libur"
+        >
+            <i class="fas fa-calendar-xmark"></i>
+            <span>Hari Libur</span>
+        </a>
+    </li>
     <!-- Divider -->
     <hr class="sidebar-divider" />
 

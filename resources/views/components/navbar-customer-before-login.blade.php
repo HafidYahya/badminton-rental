@@ -1,7 +1,7 @@
 <nav class="navbar bg-light shadow-sm fixed-top navbar-expand-lg p-3">
     <div class="container-fluid">
         <a class="navbar-brand text-dark fw-bold">
-            BOOKING
+            WISMA HARAPAN
             <span class="logo fst-italic">BADMINTON</span>
         </a>
         <button

@@ -95,6 +95,7 @@ class LapanganController extends Controller
 
         $lapangan->l_label = $request->label;
         $lapangan->l_harga = $request->harga;
+        $lapangan->l_deskripsi = $request->deskripsi;
 
         if($request->hasFile('foto_lapangan')){
             if($lapangan->l_foto && File::exists(public_path('uploads/lapangan/'.$lapangan->l_foto))){

@@ -34,6 +34,11 @@
 
         {{-- Custom CSS --}}
         <link rel="stylesheet" href="{{ asset("css/style.css") }}" />
+        {{-- FULL CALENDER --}}
+        <link
+            href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css"
+            rel="stylesheet"
+        />
     </head>
 
     <body id="page-top">
@@ -87,9 +92,6 @@
         {{-- SB Admin JS --}}
         <script src="{{ asset("templates/js/sb-admin-2.min.js") }}"></script>
 
-        {{-- Chart.js --}}
-        <script src="{{ asset("templates/vendor/chart.js/Chart.min.js") }}"></script>
-
         {{-- TinyMCE --}}
         <script src="{{ asset("tinymce/js/tinymce/tinymce.min.js") }}"></script>
         <script>
@@ -103,7 +105,11 @@
                 license_key: 'gpl',
             });
         </script>
+        {{-- FULL CALENDER --}}
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
 
+        {{-- SWEET ALERT --}}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         {{-- Custom JS From Child Pages --}}
         @stack("scripts")
     </body>

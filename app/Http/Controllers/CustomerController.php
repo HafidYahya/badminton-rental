@@ -69,7 +69,7 @@ class CustomerController extends Controller
             'updated_at' => now(),
         ]);
         
-        return redirect()->route('index')->with('register-success', 'Pendaftaran Berhasil');
+        return redirect()->route('login.customer.form')->with('register-success', 'Pendaftaran Berhasil');
     }
     // EDIT
     public function editProfileCustomer($id){
