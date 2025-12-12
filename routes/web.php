@@ -86,6 +86,7 @@ Route::middleware('customer.auth')->group(function (){
     Route::get('/profile/{id}/edit',  [CustomerController::class, 'editProfileCustomer'])->name('edit.profile.customer');
     Route::put('/profile/{customer}', [CustomerController::class, 'updateProfileCustomer'])->name('edit.profile');
     Route::get('/booking/{id}', [PeminjamanController::class, 'index'])->name('booking.index');
+    Route::post('/booking', [PeminjamanController::class, 'store'])->name('booking.store');
 });
 
 

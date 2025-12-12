@@ -29,33 +29,133 @@
 
     {{-- Font Awesome --}}
     <link rel="stylesheet" href="{{ asset('fontawesome/css/all.min.css') }}" />
-</head>
+
 
 <body>
     {{-- CONTENT --}}
     @include('components.navbar-customer-after-login')
-    <div class="main-section-peminjaman ">
-        <div class="container-fluid ">
+    <div class="main-section-peminjaman">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-6 col-md-6 col-sm-12 mb-3">
-                    <img class="img-fluid rounded shadow-sm" src="{{ asset('uploads/lapangan/' . $lapangan->l_foto) }}"
-                        alt="Foto Lapangan">
+                    <div class="card booking-card shadow-lg">
+                        <div class="card-body">
+                            <img class="img-fluid rounded shadow-sm"
+                                src="{{ asset('uploads/lapangan/' . $lapangan->l_foto) }}" alt="Foto Lapangan">
+                        </div>
+                    </div>
+
                 </div>
                 <div class="col-lg-6 col-md-6 col-sm-12 mb-3">
-                    <h2>{{ $lapangan->l_label }}</h2>
+                    <h2 class="booking-lapangan-title">{{ $lapangan->l_label }}</h2>
                     <h5 class="mb-3">
                         Harga/Jam :
-                        <small class="text-body-dark">Rp {{ number_format($lapangan->l_harga, 0, ',', '.') }}</small>
+                        <span class="booking-lapangan-price">Rp
+                            {{ number_format($lapangan->l_harga, 0, ',', '.') }}</span>
                     </h5>
-                    <h5>Deskripsi:</h5>
-                    <div class="deskripsi">{!! $lapangan->l_deskripsi !!}</div>
+                    <div class="card booking-card shadow-lg">
+                        <div class="card-header booking-card-header">
+                            <h5 class="mb-0"><i class="fas fa-align-left mr-2"></i>Deskripsi</h5>
+                        </div>
+                        <div class="card-body">{!! $lapangan->l_deskripsi !!}</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    @include('components.footer')
 
+    {{-- BOOKING FORM SECTION --}}
+    <div class="booking-form-section">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card booking-card shadow-lg">
+                        <div class="card-header booking-card-header">
+                            <h5 class="mb-0"><i class="fas fa-calendar-check mr-2"></i>Form Pemesanan</h5>
+                        </div>
+                        <div class="card-body">
+                            <form action="{{ route('booking.store') }}" method="POST" id="bookingForm">
+                                @csrf
+                                <input type="hidden" name="customer_id"
+                                    value="{{ Auth::guard('customer')->user()->c_id }}">
+                                <input type="hidden" name="lapangan_id" value="{{ $lapangan->l_id }}">
+                                <input type="hidden" name="harga_per_jam" value="{{ $lapangan->l_harga }}">
+
+
+                                {{-- Pilih Tanggal --}}
+                                <div class="form-group">
+                                    <label for="tanggal_booking"><strong class="booking-label-strong">Pilih
+                                            Tanggal</strong></label>
+                                    <input type="date" class="form-control booking-form-control-date"
+                                        id="tanggal_booking" name="tanggal_booking" min="{{ date('Y-m-d') }}" required>
+                                </div>
+
+                                {{-- Pilih Jam --}}
+                                <div class="form-group">
+                                    <label><strong class="booking-label-strong">Pilih Jam</strong></label>
+                                    <small class="text-muted d-block mb-3">Klik pada jam yang ingin Anda booking (dapat
+                                        memilih lebih dari satu)</small>
+
+                                    <div class="row booking-jam-container" id="jamContainer">
+                                        @for ($i = 0; $i < 24; $i++)
+                                            @php
+                                                $jamMulai = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00';
+                                                $jamSelesai = str_pad($i + 1, 2, '0', STR_PAD_LEFT) . ':00';
+                                            @endphp
+                                            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                                                <div class="booking-jam-item disabled rounded p-3 text-center"
+                                                    data-jam="{{ $jamMulai }}"
+                                                    data-jam-selesai="{{ $jamSelesai }}">
+                                                    <i class="far fa-clock mr-1"></i>
+                                                    {{ $jamMulai }} - {{ $jamSelesai }}
+                                                </div>
+                                            </div>
+                                        @endfor
+                                    </div>
+
+                                    {{-- Hidden inputs untuk menyimpan jam yang dipilih --}}
+                                    <input type="hidden" name="jam_booking[]" id="jamBookingInput">
+                                </div>
+
+                                {{-- Ringkasan Booking --}}
+                                <div class="form-group d-none   ">
+                                    <div class="alert booking-alert-info" id="ringkasanBooking" style="display: none;">
+                                        <h6><i class="fas fa-info-circle booking-info-icon mr-2"></i>Ringkasan Pemesanan
+                                        </h6>
+                                        <p class="mb-1"><i class="far fa-calendar booking-info-icon mr-2"></i>Tanggal:
+                                            <span id="ringkasanTanggal">-</span>
+                                        </p>
+                                        <p class="mb-1"><i class="far fa-clock booking-info-icon mr-2"></i>Jam: <span
+                                                id="ringkasanJam">-</span></p>
+                                        <p class="mb-1"><i
+                                                class="fas fa-hourglass-half booking-info-icon mr-2"></i>Total Durasi:
+                                            <span id="ringkasanDurasi">0</span> Jam
+                                        </p>
+                                        <p class="mb-0"><i
+                                                class="fas fa-money-bill-wave booking-info-icon mr-2"></i>Total Harga:
+                                            <strong>Rp <span id="ringkasanHarga">0</span></strong>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {{-- Button Submit --}}
+                                <div class="form-group mb-0">
+                                    <button type="submit" class="btn booking-btn-primary btn-block btn-lg disabled"
+                                        id="btnSubmit">
+                                        <i class="fas fa-check mr-2"></i>Konfirmasi Pemesanan
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @include('sweetalert2::index')
+    @include('components.footer')
     {{-- END CONTENT --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Bootstrap core JavaScript-->
     <script src="{{ asset('templates/vendor/jquery/jquery.min.js') }}"></script>
@@ -66,17 +166,136 @@
 
     <!-- Custom scripts for all pages-->
     <script src="{{ asset('templates/js/sb-admin-2.min.js') }}"></script>
-
-    <!-- Page level plugins -->
-    <script src="{{ asset('templates/vendor/chart.js/Chart.min.js') }}"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="{{ asset('templates/js/demo/chart-area-demo.js') }}"></script>
-    <script src="{{ asset('templates/js/demo/chart-pie-demo.js') }}"></script>
     {{-- TYNYMCE --}}
     <script src="{{ asset('tinymce/js/tinymce/tinymce.min.js') }}"></script>
 
     {{-- CUSTOME JS --}}
+    <script>
+        const hargaPerJam = {{ $lapangan->l_harga }}; // Ambil harga dari database
+
+        let selectedJam = [];
+
+        // Format tanggal ke: 12 Dec 2025
+        function formatTanggal(tgl) {
+            const dateObj = new Date(tgl);
+            return dateObj.toLocaleDateString("id-ID", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            });
+        }
+
+        // Enable jam setelah tanggal dipilih
+        $('#tanggal_booking').on('change', function() {
+            $('.booking-jam-item').removeClass('disabled');
+            $('#btnSubmit').removeClass('disabled');
+
+            const tglFormat = formatTanggal($(this).val());
+            $('#ringkasanTanggal').text(tglFormat);
+
+            updateRingkasan();
+        });
+
+        // Klik jam booking
+        $('.booking-jam-item').on('click', function() {
+            if ($(this).hasClass('disabled')) return;
+
+            const jam = $(this).data('jam');
+            $(this).toggleClass('selected');
+
+            if (selectedJam.includes(jam)) {
+                selectedJam = selectedJam.filter(j => j !== jam);
+            } else {
+                selectedJam.push(jam);
+            }
+
+            updateHiddenInputs();
+            updateRingkasan();
+        });
+
+        // Generate hidden input jam
+        function updateHiddenInputs() {
+            $('input[name="jam_booking[]"]').remove();
+
+            selectedJam.forEach(j => {
+                $('#bookingForm').append(
+                    $('<input>', {
+                        type: 'hidden',
+                        name: 'jam_booking[]',
+                        value: j
+                    })
+                );
+            });
+        }
+
+        // Update ringkasan di halaman
+        function updateRingkasan() {
+            const tanggal = $('#tanggal_booking').val();
+
+            if (!tanggal || selectedJam.length === 0) {
+                $('#ringkasanBooking').hide();
+                return;
+            }
+
+            selectedJam.sort();
+
+            const jamText = selectedJam.map(jam => {
+                const nextHour = String(parseInt(jam.split(':')[0]) + 1).padStart(2, '0') + ':00';
+                return `${jam} - ${nextHour}`;
+            }).join(', ');
+
+            const durasi = selectedJam.length;
+            const totalHarga = durasi * hargaPerJam;
+
+            $('#ringkasanJam').text(jamText);
+            $('#ringkasanDurasi').text(durasi);
+            $('#ringkasanHarga').text(totalHarga.toLocaleString('id-ID'));
+            $('#ringkasanBooking').show();
+        }
+
+        // Submit form → SweetAlert konfirmasi
+        $('#bookingForm').on('submit', function(e) {
+            e.preventDefault();
+
+            if (selectedJam.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Tidak Ada Jam',
+                    text: 'Pilih minimal 1 jam untuk booking.',
+                    confirmButtonText: 'OK'
+                });
+                return false; // Stop submit
+            }
+            const tanggal = $('#ringkasanTanggal').text();
+            const jam = $('#ringkasanJam').text();
+            const durasi = $('#ringkasanDurasi').text();
+            const harga = $('#ringkasanHarga').text();
+
+            Swal.fire({
+                title: "Konfirmasi Pemesanan",
+                html: `
+                <div style="text-align:left;">
+                    <p><i class="far fa-calendar mr-2"></i><strong>Tanggal:</strong> ${tanggal}</p>
+                    <p><i class="far fa-clock mr-2"></i><strong>Jam:</strong> ${jam}</p>
+                    <p><i class="fas fa-hourglass-half mr-2"></i><strong>Durasi:</strong> ${durasi} Jam</p>
+                    <p><i class="fas fa-money-bill-wave mr-2"></i><strong>Total Harga:</strong> Rp ${harga}</p>
+                </div>
+            `,
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonText: "Ya, pesan sekarang!",
+                cancelButtonText: "Batal"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    e.target.submit();
+                }
+            });
+        });
+
+
+        // VALIDASI ERROR
+    </script>
+
     @stack('scripts')
 </body>
 
