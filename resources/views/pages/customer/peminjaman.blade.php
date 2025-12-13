@@ -291,9 +291,6 @@
                 }
             });
         });
-
-
-        // VALIDASI ERROR
     </script>
 
     @stack('scripts')

@@ -29,7 +29,7 @@ class PeminjamanController extends Controller
                 'title' => 'Jam Tidak Berurutan',
                 'text' => 'Jam yang dipilih harus berurutan. Contoh: 08:00, 09:00, 10:00',
             ]);
-            return back()->withInput();
+            return back();
         }
     }
 
