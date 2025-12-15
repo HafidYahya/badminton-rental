@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HariLibur;
+use App\Models\JamOperasional;
 use App\Models\Lapangan;
+use App\Models\Peminjaman;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -86,6 +89,74 @@ class PeminjamanController extends Controller
         ]);
         return back();
     }
+
+    public function checkJam(Request $request)
+    {
+        $request->validate([
+            'tanggal' => 'required|date',
+            'lapangan_id' => 'required'
+        ]);
+
+        $tanggal = Carbon::parse($request->tanggal);
+
+        // Mapping hari
+        $days = [
+            'Monday' => 'Senin',
+            'Tuesday' => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis',
+            'Friday' => 'Jumat',
+            'Saturday' => 'Sabtu',
+            'Sunday' => 'Minggu',
+        ];
+
+        $hari = $days[$tanggal->format('l')];
+
+        // Cek hari libur
+        $libur = HariLibur::where('is_active', 1)
+            ->whereDate('hl_tanggal_mulai', '<=', $tanggal)
+            ->whereDate('hl_tanggal_selesai', '>=', $tanggal)
+            ->exists();
+
+        // Jam operasional
+        $operasional = JamOperasional::where('jo_hari', $hari)->first();
+
+        if (!$operasional || $operasional->jo_is_hari_libur) {
+            return response()->json([
+                'libur' => true
+            ]);
+        }
+
+        // Jam terbooking
+        $jamTerbooking = [];
+
+        $peminjaman = Peminjaman::where('p_lapangan_id', $request->lapangan_id)
+            ->where('p_status', 'RUNNING')
+            ->whereDate('p_tanggal', $tanggal)
+            ->get();
+
+        foreach ($peminjaman as $p) {
+            $start = Carbon::parse($p->p_jam_mulai);
+            $end   = Carbon::parse($p->p_jam_selesai);
+
+            while ($start < $end) {
+                $jamTerbooking[] = $start->format('H:i');
+                $start->addHour();
+            }
+        }
+
+        return response()->json([
+            'libur' => false,
+            'jam_buka' => substr($operasional->jo_jam_buka, 0, 5),
+            'jam_tutup' => substr($operasional->jo_jam_tutup, 0, 5),
+            'jam_terbooking' => $jamTerbooking
+        ]);
+    }
+
+
+
+
+
 
 
 

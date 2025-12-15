@@ -215,14 +215,87 @@
 
         // Enable jam setelah tanggal dipilih
         $('#tanggal_booking').on('change', function() {
-            $('.booking-jam-item').removeClass('disabled');
+            const tanggal = $(this).val();
+            const lapanganId = {{ $lapangan->l_id }};
+
+            // Reset state
+            selectedJam = [];
+            $('input[name="jam_booking[]"]').remove();
+
+            $('.booking-jam-item')
+                .removeClass('disabled selected booked')
+                .css('pointer-events', 'auto');
+
+            $('#ringkasanBooking').hide();
+
+            // Format tanggal ringkasan
+            $('#ringkasanTanggal').text(formatTanggal(tanggal));
+
+            // Enable tombol submit
             $('#btnSubmit').removeClass('disabled');
 
-            const tglFormat = formatTanggal($(this).val());
-            $('#ringkasanTanggal').text(tglFormat);
+            // 🔥 AJAX cek database
+            $.ajax({
+                url: "{{ route('booking.check-jam') }}",
+                method: "GET",
+                data: {
+                    tanggal: tanggal,
+                    lapangan_id: lapanganId
+                },
+                success: function(res) {
 
-            updateRingkasan();
+                    // 1 Reset semua jam
+                    $('.booking-jam-item')
+                        .addClass('disabled')
+                        .removeClass('selected booked')
+                        .css('pointer-events', 'none');
+
+                    // Reset pilihan
+                    selectedJam = [];
+                    $('input[name="jam_booking[]"]').remove();
+
+                    // 2 Jika hari libur
+                    if (res.libur) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Libur',
+                            text: 'Lapangan tidak beroperasi di tanggal ini'
+                        });
+                        return;
+                    }
+
+                    const jamBuka = res.jam_buka; // contoh: "08:00"
+                    const jamTutup = res.jam_tutup; // contoh: "22:00"
+                    const jamTerbooking = res.jam_terbooking;
+
+                    // 3 Enable jam sesuai jam operasional
+                    $('.booking-jam-item').each(function() {
+                        const jam = $(this).data('jam');
+
+                        if (jam >= jamBuka && jam < jamTutup) {
+                            $(this)
+                                .removeClass('disabled')
+                                .css('pointer-events', 'auto');
+                        }
+
+                        // 4 Disable jika sudah dibooking
+                        if (jamTerbooking.includes(jam)) {
+                            $(this)
+                                .addClass('disabled booked')
+                                .css('pointer-events', 'none');
+                        }
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Gagal memuat jam booking'
+                    });
+                }
+            });
         });
+
 
         // Klik jam booking
         $('.booking-jam-item').on('click', function() {

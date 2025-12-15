@@ -11,16 +11,19 @@ use SweetAlert2\Laravel\Swal;
 class CustomerController extends Controller
 {
 
-    public function index(){
+    public function index()
+    {
         $customer = Customer::all();
         return view('pages.admin.customer.index', compact('customer'));
     }
-    public function registerForm(){
+    public function registerForm()
+    {
         return view('pages.customer.register');
     }
 
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $request->validate([
             'nama_lengkap' => 'required|max:20|regex:/^[A-Za-z\s]+$/',
             'no_hp' => 'required|numeric|digits_between:9,15',
@@ -29,7 +32,7 @@ class CustomerController extends Controller
             'konfirmasi_password' => 'required|min:8|same:password',
             'alamat' => 'nullable',
             'foto_profile' => 'mimes:jpg,jpeg,png,webp,heic|max:2048'
-        ],[
+        ], [
             'nama_lengkap.required' => 'Nama lengkap tidak boleh kosong',
             'nama_lengkap.max' => 'Maksimal 20 karakter',
             'nama_lengkap.regex' => 'Nama lengkap tidak boleh mengandung simbol atau angka',
@@ -49,9 +52,9 @@ class CustomerController extends Controller
         ]);
 
         $fileName = 'undraw_profile.svg';
-        if($request->hasFile('foto_profile')){
+        if ($request->hasFile('foto_profile')) {
             $file = $request->file('foto_profile');
-            $fileName = time().'.'.$file->getClientOriginalExtension();
+            $fileName = time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/customers'), $fileName);
         }
 
@@ -68,24 +71,31 @@ class CustomerController extends Controller
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        
-        return redirect()->route('login.customer.form')->with('register-success', 'Pendaftaran Berhasil');
+        Swal::fire([
+            'title' => 'Berhasil!',
+            'text' => 'Anda berhasil mendaftar, silahkan login',
+            'icon' => 'success',
+            'showConfirmButton' => true,
+        ]);
+        return redirect()->route('login.customer.form');
     }
     // EDIT
-    public function editProfileCustomer($id){
+    public function editProfileCustomer($id)
+    {
         $customer = Customer::find($id);
         return view('pages.customer.edit', compact('customer'));
     }
-    public function updateProfileCustomer(Request $request, Customer $customer){
+    public function updateProfileCustomer(Request $request, Customer $customer)
+    {
         $request->validate([
             'nama_lengkap' => 'required|max:20|regex:/^[A-Za-z\s]+$/',
             'no_hp' => 'required|numeric|digits_between:9,15',
-            'username' => 'required|alpha_dash|unique:customer,c_username,'.$customer->c_id.',c_id',
+            'username' => 'required|alpha_dash|unique:customer,c_username,' . $customer->c_id . ',c_id',
             'password' => 'nullable|min:8',
             'konfirmasi_password' => 'nullable|min:8|same:password',
             'alamat' => 'nullable',
             'foto_profile' => 'mimes:jpg,jpeg,png,webp,heic|max:2048'
-        ],[
+        ], [
             'nama_lengkap.required' => 'Nama lengkap tidak boleh kosong',
             'nama_lengkap.max' => 'Maksimal 20 karakter',
             'nama_lengkap.regex' => 'Nama lengkap tidak boleh mengandung simbol atau angka',
@@ -107,50 +117,51 @@ class CustomerController extends Controller
         $customer->c_alamat = $request->alamat;
 
         // Cek password baru
-        if($request->filled('password')){
+        if ($request->filled('password')) {
             $customer->c_password = bcrypt($request->password);
         }
         // cek file foto
-        if($request->hasFile('foto_profile')){
-            if($customer->c_foto_profile && File::exists(public_path('uploads/customers/'.$customer->c_foto_profile))){
-                if($customer->c_foto_profile !== 'undraw_profile.svg'){
-                    File::delete(public_path('uploads/customers/'.$customer->c_foto_profile));
+        if ($request->hasFile('foto_profile')) {
+            if ($customer->c_foto_profile && File::exists(public_path('uploads/customers/' . $customer->c_foto_profile))) {
+                if ($customer->c_foto_profile !== 'undraw_profile.svg') {
+                    File::delete(public_path('uploads/customers/' . $customer->c_foto_profile));
                 }
             }
             $file = $request->file('foto_profile');
-            $fileName = time().'.'.$file->getClientOriginalExtension();
+            $fileName = time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/customers'), $fileName);
             $customer->c_foto_profile = $fileName;
-
         }
         $customer->save();
         Swal::fire([
-        'title' => 'Berhasil!',
-        'text' => 'Profil berhasil diperbarui.',
-        'icon' => 'success',
-        'timer' => 2000,
-        'showConfirmButton' => false,
-    ]);
+            'title' => 'Berhasil!',
+            'text' => 'Profil berhasil diperbarui.',
+            'icon' => 'success',
+            'timer' => 2000,
+            'showConfirmButton' => false,
+        ]);
         return back();
     }
     // END EDIT
-    public function activateMember($id){
+    public function activateMember($id)
+    {
         $customer = Customer::find($id);
         $customer->c_is_member = 'Y';
         $customer->save();
         return back();
     }
-    public function deactivateMember($id){
+    public function deactivateMember($id)
+    {
         $customer = Customer::find($id);
         $customer->c_is_member = 'N';
         $customer->save();
         return back();
     }
-    public function status($id){
+    public function status($id)
+    {
         $customer = Customer::find($id);
-        $customer->c_status = $customer->c_status === 'active'? 'inactive':'active';
+        $customer->c_status = $customer->c_status === 'active' ? 'inactive' : 'active';
         $customer->save();
         return back();
-        
     }
 }
