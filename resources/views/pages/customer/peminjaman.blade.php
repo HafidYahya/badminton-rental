@@ -74,7 +74,8 @@
                             <h5 class="mb-0"><i class="fas fa-calendar-check mr-2"></i>Form Pemesanan</h5>
                         </div>
                         <div class="card-body">
-                            <form action="{{ route('booking.store') }}" method="POST" id="bookingForm">
+                            <form action="{{ route('booking.store') }}" method="POST" id="bookingForm"
+                                enctype="multipart/form-data">
                                 @csrf
                                 <input type="hidden" name="customer_id"
                                     value="{{ Auth::guard('customer')->user()->c_id }}">
@@ -138,6 +139,19 @@
                                     </div>
                                 </div>
 
+                                {{-- Upload Bukti Pembayaran --}}
+                                <div class="form-group">
+                                    <label for="bukti_pembayaran"><strong class="booking-label-strong">Kirim Bukti
+                                            Pembayaran</strong></label>
+                                    <input type="file" class="form-control booking-form-control-date"
+                                        id="bukti_pembayaran" name="bukti_pembayaran" required>
+                                    @error('bukti_pembayaran')
+                                        <div class="invalid-feedback d-flex align-items-center">
+                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
                                 {{-- Button Submit --}}
                                 <div class="form-group mb-0">
                                     <button type="submit" class="btn booking-btn-primary btn-block btn-lg disabled"
@@ -168,6 +182,20 @@
     <script src="{{ asset('templates/js/sb-admin-2.min.js') }}"></script>
     {{-- TYNYMCE --}}
     <script src="{{ asset('tinymce/js/tinymce/tinymce.min.js') }}"></script>
+    {{-- SWEET alert --}}
+    @if ($errors->has('bukti_pembayaran'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Upload Gagal',
+                    text: '{{ $errors->first('bukti_pembayaran') }}',
+                    confirmButtonText: 'OK'
+                });
+            });
+        </script>
+    @endif
+
 
     {{-- CUSTOME JS --}}
     <script>
