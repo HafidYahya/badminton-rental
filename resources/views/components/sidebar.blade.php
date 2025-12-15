@@ -42,24 +42,22 @@
     <hr class="sidebar-divider" />
 
     <!-- Heading -->
-    @if (false)
-        <div class="sidebar-heading">Jadwal</div>
-        <li class="nav-item">
-            <a class="nav-link {{ Route::is('jam-operasional.*') ? 'active' : '' }}"
-                href="{{ route('jam-operasional.index') }}">
-                <i class="fa-solid fa-clock"></i>
-                <span>Jam Operasional</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ Route::is('hari.libur.index') ? 'active' : '' }}" href="/hari-libur">
-                <i class="fas fa-calendar-xmark"></i>
-                <span>Hari Libur</span>
-            </a>
-        </li>
-        <!-- Divider -->
-        <hr class="sidebar-divider" />
-    @endif
+    <div class="sidebar-heading">Jadwal</div>
+    <li class="nav-item">
+        <a class="nav-link {{ Route::is('jam-operasional.*') ? 'active' : '' }}"
+            href="{{ route('jam-operasional.index') }}">
+            <i class="fa-solid fa-clock"></i>
+            <span>Jam Operasional</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {{ Route::is('hari.libur.index') ? 'active' : '' }}" href="/hari-libur">
+            <i class="fas fa-calendar-xmark"></i>
+            <span>Hari Libur</span>
+        </a>
+    </li>
+    <!-- Divider -->
+    <hr class="sidebar-divider" />
 
     <!-- Heading -->
     <div class="sidebar-heading">Pengaturan</div>

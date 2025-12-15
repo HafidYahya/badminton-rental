@@ -16,16 +16,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/', function(){
+Route::get('/', function () {
     $lapangan = Lapangan::all();
 
     $today = Carbon::today();
 
     // Cek apakah hari ini libur di tabel hari_libur
-    $isHoliday = HariLibur::whereDate('hl_tanggal_mulai', '<=', $today)
-                            ->whereDate('hl_tanggal_selesai', '>=', $today)
-                            ->exists();
-    
+    $isHoliday = HariLibur::where('is_active', 1)->whereDate('hl_tanggal_mulai', '<=', $today)
+        ->whereDate('hl_tanggal_selesai', '>=', $today)
+        ->exists();
+
 
     $days = [
         'Monday' => 'Senin',
@@ -36,7 +36,7 @@ Route::get('/', function(){
         'Saturday' => 'Sabtu',
         'Sunday' => 'Minggu',
     ];
-    
+
     $hariIni = $days[$today->format('l')]; // Misal: "Rabu"
 
     // Atau cek kolom is_hari_libur di jam_operasional
@@ -60,7 +60,7 @@ Route::get('/register', [CustomerController::class, 'registerForm'])->name('regi
 
 
 
-Route::middleware('admin.auth')->group(function(){
+Route::middleware('admin.auth')->group(function () {
     Route::get('/admin', function () {
         return view('pages.admin.dashboard');
     })->name('dashboard');
@@ -76,13 +76,11 @@ Route::middleware('admin.auth')->group(function(){
     Route::get('/hari-libur', [HariLiburController::class, 'index'])->name('hari.libur.index');
     Route::get('/hari-libur/data', [HariLiburController::class, 'data']);
     Route::post('/hari-libur', [HariLiburController::class, 'store']);
-    Route::put('/hari-libur/{id}', [HariLiburController::class, 'update']); 
+    Route::put('/hari-libur/{id}', [HariLiburController::class, 'update']);
     Route::delete('/hari-libur/{id}', [HariLiburController::class, 'destroy']);
-
-
 });
 
-Route::middleware('customer.auth')->group(function (){
+Route::middleware('customer.auth')->group(function () {
     Route::get('/profile/{id}/edit',  [CustomerController::class, 'editProfileCustomer'])->name('edit.profile.customer');
     Route::put('/profile/{customer}', [CustomerController::class, 'updateProfileCustomer'])->name('edit.profile');
     Route::get('/booking/{id}', [PeminjamanController::class, 'index'])->name('booking.index');
