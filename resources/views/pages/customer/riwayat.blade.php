@@ -43,21 +43,23 @@
 
         .page-header h2 {
             font-size: 1.75rem;
-            font-weight: 600;
-            color: #2c3e50;
+            font-weight: 700;
+            color: #ffb22c;
             margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .page-header p {
-            color: #6c757d;
+            color: #666666;
             margin: 0;
         }
 
         .table-card {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(255, 178, 44, 0.2);
             overflow: hidden;
+            border: 2px solid #ffb22c;
         }
 
         .table-responsive {
@@ -69,50 +71,74 @@
         }
 
         .table thead th {
-            background: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-            color: #495057;
-            font-weight: 600;
+            background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+            border-bottom: 3px solid #ffb22c;
+            color: #ffb22c;
+            font-weight: 700;
             font-size: 0.875rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             padding: 1rem;
         }
 
         .table tbody td {
             padding: 1rem;
             vertical-align: middle;
-            color: #495057;
+            color: #2c2c2c;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .table tbody tr {
-            transition: background-color 0.2s ease;
-        }
-
-        .table tbody tr:hover {
-            background-color: #f8f9fa;
+            transition: all 0.3s ease;
         }
 
         .badge {
             padding: 0.5rem 0.875rem;
             font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 6px;
+            font-weight: 700;
+            border-radius: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
+        .text-bg-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+        }
+
+        .text-bg-warning {
+            background: linear-gradient(135deg, #ffb22c 0%, #ffa500 100%);
+            color: #1a1a1a;
+        }
+
+        .text-bg-success {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+        }
+
+        .text-bg-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
         .btn-cancel {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border: 2px solid #dc3545;
+            color: white;
             padding: 0.5rem 1rem;
             font-size: 0.875rem;
-            font-weight: 500;
-            border-radius: 6px;
-            transition: all 0.2s ease;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn-cancel:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+            color: white;
         }
 
         .empty-state {
@@ -122,51 +148,88 @@
 
         .empty-state i {
             font-size: 3rem;
-            color: #dee2e6;
+            color: #ffb22c;
             margin-bottom: 1rem;
         }
 
         .empty-state p {
-            color: #6c757d;
+            color: #666666;
             font-size: 1rem;
+            font-weight: 500;
         }
 
         .modal-content {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 15px;
+            border: 2px solid #ffb22c;
+            box-shadow: 0 10px 40px rgba(255, 178, 44, 0.3);
         }
 
         .modal-header {
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
+            background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+            border-bottom: 3px solid #ffb22c;
             padding: 1.25rem 1.5rem;
-            border-radius: 12px 12px 0 0;
+            border-radius: 15px 15px 0 0;
         }
 
         .modal-title {
-            font-weight: 600;
-            color: #2c3e50;
+            font-weight: 700;
+            color: #ffb22c;
         }
 
         .modal-body {
             padding: 1.5rem;
+            background: #ffffff;
         }
 
         .modal-footer {
-            border-top: 1px solid #dee2e6;
+            border-top: 2px solid #ffb22c;
             padding: 1rem 1.5rem;
+            background: #f8f9fa;
         }
 
         .form-label {
-            font-weight: 500;
-            color: #495057;
+            font-weight: 600;
+            color: #2c2c2c;
             margin-bottom: 0.5rem;
         }
 
         .form-control:focus {
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+            border-color: #ffb22c;
+            box-shadow: 0 0 0 0.2rem rgba(255, 178, 44, 0.25);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            border: 2px solid #6c757d;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #545b62 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border: 2px solid #dc3545;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+            color: white;
+        }
+
+        .btn-close {
+            filter: brightness(0) invert(1);
         }
 
         @media (max-width: 768px) {
@@ -218,7 +281,9 @@
                             <tr>
                                 <td scope="row">{{ $loop->iteration }}</td>
                                 <td><strong>{{ $booking->lapangan->l_label }}</strong></td>
-                                <td><strong>Rp{{ number_format($booking->p_total_harga, 0, ',', '.') }}</strong></td>
+                                <td><strong
+                                        style="color: #ffb22c;">Rp{{ number_format($booking->p_total_harga, 0, ',', '.') }}</strong>
+                                </td>
                                 <td>
                                     {{ Carbon\Carbon::parse($booking->p_tanggal)->locale('id')->translatedFormat('l, d F Y') }}
                                 </td>
@@ -239,8 +304,8 @@
                                 </td>
                                 <td>
                                     @if ($booking->p_status === 'PENDING' || $booking->p_status === 'RUNNING')
-                                        <button type="button" class="btn btn-danger btn-sm btn-cancel"
-                                            data-bs-toggle="modal" data-bs-target="#modalCancel{{ $booking->p_id }}">
+                                        <button type="button" class="btn btn-cancel btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#modalCancel{{ $booking->p_id }}">
                                             <i class="fas fa-times mr-1"></i> Cancel
                                         </button>
                                     @endif
@@ -270,7 +335,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">
-                            <i class="fas fa-exclamation-triangle text-warning mr-2"></i>
+                            <i class="fas fa-exclamation-triangle mr-2" style="color: #ffa500;"></i>
                             Konfirmasi Pembatalan
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -306,9 +371,32 @@
             </div>
         </div>
     @endforeach
-
+    <footer class="sticky-footer mt-5"
+        style="background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); border-top: 3px solid #ffb22c;">
+        <div class="container my-auto py-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <h5 class="fw-bold mb-2" style="color: #ffb22c;">
+                        WISMA HARAPAN
+                        <span style="color: #ffa500; font-style: italic;">BADMINTON</span>
+                    </h5>
+                    <p class="mb-0 small" style="color: #cccccc;">
+                        Tempat terbaik untuk bermain badminton
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="copyright" style="color: #ffb22c;">
+                        <span class="small">Copyright &copy; Muhdiatul Zannah 2025</span>
+                    </div>
+                    <div class="mt-2">
+                        <span class="small" style="color: #cccccc;">Jl. Wisma Lantana IV No.D07-No 49, RT.006/RW.011,
+                            Gembor, Kec. Periuk, Kota Tangerang, Banten 15133</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
     @include('sweetalert2::index')
-    @include('components.footer')
     {{-- END CONTENT --}}
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

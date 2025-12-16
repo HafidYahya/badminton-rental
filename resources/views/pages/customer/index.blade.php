@@ -53,36 +53,41 @@
         <div class="row g-4">
             @foreach ($lapangan as $lp)
                 <div class="col-12 col-md-4">
-                    <div class="card h-100 shadow-sm">
+                    <div class="card h-100 shadow-sm border-0"
+                        style="border: 2px solid #ffb22c; border-radius: 15px; overflow: hidden;">
                         <img src="{{ asset('uploads/lapangan/' . $lp->l_foto) }}"
                             class="card-img-top foto-lapangan-index" alt="{{ $lp->l_label }}" />
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{ $lp->l_label }}</h5>
-                            <p class="card-text">
+                            <h5 class="card-title booking-lapangan-title">{{ $lp->l_label }}</h5>
+                            <p class="card-text booking-lapangan-price">
                                 Harga: Rp
                                 {{ number_format($lp->l_harga, 0, ',', '.') }}/jam
                             </p>
                             @auth('customer')
                                 @if ($isTodayHoliday)
-                                    <a class="btn btn-danger mt-auto disabled">
+                                    <button class="btn mt-auto disabled"
+                                        style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; border: 2px solid #dc3545; padding: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 8px;">
                                         Hari Ini Libur
-                                    </a>
+                                    </button>
                                 @elseif ($lp->l_status === 'active')
-                                    <a href="{{ route('booking.index', $lp->l_id) }}" class="btn btn-primary mt-auto">
+                                    <a href="{{ route('booking.index', $lp->l_id) }}"
+                                        class="btn booking-btn-primary mt-auto">
                                         Pesan Sekarang
                                     </a>
                                 @else
-                                    <a href="#" class="btn btn-secondary mt-auto disabled">
+                                    <button class="btn mt-auto disabled"
+                                        style="background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white; border: 2px solid #6c757d; padding: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 8px;">
                                         Pesan Sekarang
-                                    </a>
+                                    </button>
                                 @endif
                             @else
                                 @if ($isTodayHoliday)
-                                    <a href="#" class="btn btn-danger mt-auto disabled">
+                                    <button class="btn mt-auto disabled"
+                                        style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; border: 2px solid #dc3545; padding: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 8px;">
                                         Hari Ini Libur
-                                    </a>
+                                    </button>
                                 @else
-                                    <a href="{{ route('login.customer') }}" class="btn btn-primary mt-auto">
+                                    <a href="{{ route('login.customer') }}" class="btn booking-btn-primary mt-auto">
                                         Pesan Sekarang
                                     </a>
                                 @endif
@@ -93,7 +98,31 @@
             @endforeach
         </div>
     </div>
-    @include('components.footer')
+    <footer class="sticky-footer mt-5"
+        style="background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); border-top: 3px solid #ffb22c;">
+        <div class="container my-auto py-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <h5 class="fw-bold mb-2" style="color: #ffb22c;">
+                        WISMA HARAPAN
+                        <span style="color: #ffa500; font-style: italic;">BADMINTON</span>
+                    </h5>
+                    <p class="mb-0 small" style="color: #cccccc;">
+                        Tempat terbaik untuk bermain badminton
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="copyright" style="color: #ffb22c;">
+                        <span class="small">Copyright &copy; Muhdiatul Zannah 2025</span>
+                    </div>
+                    <div class="mt-2">
+                        <span class="small" style="color: #cccccc;">Jl. Wisma Lantana IV No.D07-No 49, RT.006/RW.011,
+                            Gembor, Kec. Periuk, Kota Tangerang, Banten 15133</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     {{-- END CONTENT --}}
 

@@ -123,6 +123,66 @@
     transform: scale(1.05);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
+/* NAVBAR CUSTOMER BLACK GOLD THEME */
+.navbar-dropdown-item {
+    transition: all 0.3s ease;
+}
+
+.navbar-dropdown-item:hover {
+    background: linear-gradient(135deg, #ffb22c 0%, #ffa500 100%) !important;
+    color: #1a1a1a !important;
+    transform: translateX(5px);
+}
+
+.navbar-dropdown-item:hover i {
+    color: #1a1a1a !important;
+}
+
+.navbar-brand:hover {
+    opacity: 0.9;
+    transition: all 0.3s ease;
+}
+/* NAVBAR BEFORE LOGIN BLACK GOLD THEME */
+.navbar-home-link {
+    transition: all 0.3s ease;
+}
+
+.navbar-home-link:hover {
+    color: #ffa500 !important;
+    transform: translateY(-2px);
+}
+
+.navbar-btn-login {
+    transition: all 0.3s ease;
+}
+
+.navbar-btn-login:hover {
+    background: linear-gradient(135deg, #ffa500 0%, #ffb22c 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 178, 44, 0.4) !important;
+}
+
+.navbar-btn-register {
+    transition: all 0.3s ease;
+}
+
+.navbar-btn-register:hover {
+    background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 178, 44, 0.5) !important;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 178, 44, 0.25);
+}
+/* FOOTER BLACK GOLD THEME */
+.sticky-footer {
+    transition: all 0.3s ease;
+}
+
+.sticky-footer:hover {
+    border-top-color: #ffa500;
+}
 /* =======================
    FORM INPUTS
    ======================= */

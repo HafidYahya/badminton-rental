@@ -5,6 +5,11 @@
     <form action="{{ route('jam-operasional.update-batch') }}" method="POST">
         @csrf
         @method('PUT')
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary mb-3">
+                <i class="fas fa-rotate me-2"></i>Simpan Perubahan
+            </button>
+        </div>
         <div class="table-responsive">
             <table class="table table-bordered text-nowrap">
                 <thead>
@@ -43,7 +48,7 @@
                 </tbody>
             </table>
         </div>
-        <button type="submit" class="btn btn-primary">Simpan Semua</button>
+
     </form>
     @include('sweetalert2::index')
 @endsection
