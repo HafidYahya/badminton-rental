@@ -34,7 +34,7 @@ class AuthController extends Controller
                 'username' => 'Username tidak terdaftar'
             ])->onlyInput('username');
         }
-        if ($user->c_status === 'INACTIVE') {
+        if ($user->c_status === 'inactive') {
             return back()->withErrors([
                 'username' => 'Akun anda tidak aktif'
             ])->onlyInput('username');

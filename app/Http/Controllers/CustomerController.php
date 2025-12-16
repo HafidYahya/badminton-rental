@@ -148,6 +148,15 @@ class CustomerController extends Controller
         $customer = Customer::find($id);
         $customer->c_is_member = 'Y';
         $customer->save();
+        Swal::fire([
+            'toast' => true,
+            'position' => 'top-end',
+            'icon' => 'success',
+            'title' => 'Berhasil mengubah status member',
+            'showConfirmButton' => false,
+            'timer' => 3000,
+            'timerProgressBar' => true,
+        ]);
         return back();
     }
     public function deactivateMember($id)
@@ -155,6 +164,15 @@ class CustomerController extends Controller
         $customer = Customer::find($id);
         $customer->c_is_member = 'N';
         $customer->save();
+        Swal::fire([
+            'toast' => true,
+            'position' => 'top-end',
+            'icon' => 'success',
+            'title' => 'Berhasil mengubah status member',
+            'showConfirmButton' => false,
+            'timer' => 3000,
+            'timerProgressBar' => true,
+        ]);
         return back();
     }
     public function status($id)
@@ -162,6 +180,15 @@ class CustomerController extends Controller
         $customer = Customer::find($id);
         $customer->c_status = $customer->c_status === 'active' ? 'inactive' : 'active';
         $customer->save();
+        Swal::fire([
+            'toast' => true,
+            'position' => 'top-end',
+            'icon' => 'success',
+            'title' => 'Berhasil mengubah status customer menjadi ' . $customer->c_status,
+            'showConfirmButton' => false,
+            'timer' => 3000,
+            'timerProgressBar' => true,
+        ]);
         return back();
     }
 }
