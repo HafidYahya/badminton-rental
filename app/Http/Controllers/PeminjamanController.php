@@ -179,13 +179,53 @@ class PeminjamanController extends Controller
         $peminjaman = Peminjaman::with(['customer', 'lapangan'])->where('p_customer_id', $id)->orderBy('created_at', 'desc')->get();
         return view('pages.customer.riwayat', compact('peminjaman'));
     }
+    public function cancel(Request $request, $id)
+    {
+        $request->validate([
+            'alasan_cancel' => 'required|min:5'
+        ], [
+            'alasan_cancel.required' => 'Alasan pembatalan wajib diisi',
+            'alasan_cancel.min' => 'Minimal 5 karakter'
+        ]);
+
+        $peminjaman = Peminjaman::where('p_id', $id)
+            ->whereIn('p_status', ['PENDING', 'RUNNING'])
+            ->firstOrFail();
+
+        $diff = Carbon::today()->diffInDays(
+            Carbon::parse($peminjaman->p_tanggal),
+            false
+        );
+
+        if ($diff <= 1) {
+            Swal::fire([
+                'icon' => 'error',
+                'title' => 'Pembatalan pesanan gagal',
+                'text' => 'Maaf, pemesanan tidak bisa dibatalkan pada H-1 atau hari H',
+                'showConfirmButton' => true
+            ]);
+            return redirect()->route('riwayat.booking', $peminjaman->p_customer_id);
+        }
+
+        $peminjaman->p_status = 'CANCEL';
+        $peminjaman->p_alasan_cancel = $request->alasan_cancel;
+        $peminjaman->save();
+
+        Swal::fire([
+            'icon' => 'success',
+            'title' => 'Berhasil',
+            'text' => 'Pemesanan berhasil dibatalkan',
+        ]);
+
+        return redirect()->route('riwayat.booking', $peminjaman->p_customer_id);
+    }
 
 
 
     // ADMIN
     public function transaksi()
     {
-        $peminjaman = Peminjaman::with(['customer', 'lapangan'])->orderBy('created_at', 'desc')->get();
+        $peminjaman = Peminjaman::with(['customer', 'lapangan'])->orderBy('created_at', 'asc')->get();
         return view('pages.admin.peminjaman.index', compact('peminjaman'));
     }
 

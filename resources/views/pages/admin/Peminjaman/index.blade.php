@@ -64,7 +64,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center">
+                        <td colspan="14" class="text-center">
                             Belum ada data pemesanan
                         </td>
                     </tr>
@@ -114,25 +114,25 @@
                             @method('PUT')
                             <div class="d-flex gap-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="status" id="running"
-                                        value="RUNNING">
-                                    <label class="form-check-label" for="running">
+                                    <input class="form-check-input" type="radio" name="status"
+                                        id="running{{ $booking->p_id }}" value="RUNNING">
+                                    <label class="form-check-label" for="running{{ $booking->p_id }}">
                                         RUNNING
                                     </label>
                                 </div>
 
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="status" id="finish"
-                                        value="FINISH">
-                                    <label class="form-check-label" for="finish">
+                                    <input class="form-check-input" type="radio" name="status"
+                                        id="finish{{ $booking->p_id }}" value="FINISH">
+                                    <label class="form-check-label" for="finish{{ $booking->p_id }}">
                                         FINISH
                                     </label>
                                 </div>
 
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="status" id="cancel"
-                                        value="CANCEL">
-                                    <label class="form-check-label" for="cancel">
+                                    <input class="form-check-input" type="radio" name="status"
+                                        id="cancel{{ $booking->p_id }}" value="CANCEL">
+                                    <label class="form-check-label" for="cancel{{ $booking->p_id }}">
                                         CANCEL
                                     </label>
                                 </div>
@@ -144,6 +144,7 @@
                                 <button type="submit" class="btn btn-warning">
                                     Proses
                                 </button>
+                            </div>
                         </form>
                     </div>
                 </div>
