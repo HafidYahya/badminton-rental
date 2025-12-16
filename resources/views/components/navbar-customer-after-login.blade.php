@@ -6,21 +6,14 @@
         </a>
         <ul class="navbar-nav">
             <li class="nav-item dropdown dropstart no-arrow position-relative">
-                <a
-                    class="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                >
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
                     <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                        {{ Auth::guard("customer")->user()->c_nama_lengkap }}
+                        {{ Auth::guard('customer')->user()->c_nama_lengkap }}
                     </span>
-                    <img
-                        class="customer-profile rounded-circle"
-                        src="{{ asset("uploads/customers/" . Auth::guard("customer")->user()->c_foto_profile) }}"
-                        alt="Foto Profile"
-                    />
+                    <img class="customer-profile rounded-circle"
+                        src="{{ asset('uploads/customers/' . Auth::guard('customer')->user()->c_foto_profile) }}"
+                        alt="Foto Profile" />
                 </a>
                 <ul class="dropdown-menu position-absolute">
                     <li>
@@ -30,19 +23,21 @@
                         </a>
                     </li>
                     <li>
-                        <a
-                            class="dropdown-item mb-2"
-                            href="{{ route("edit.profile.customer", Auth::guard("customer")->user()->c_id) }}"
-                        >
+                        <a href="{{ route('riwayat.booking', Auth::guard('customer')->user()->c_id) }}"
+                            class="dropdown-item mb-2">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            Riwayat Booking
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item mb-2"
+                            href="{{ route('edit.profile.customer', Auth::guard('customer')->user()->c_id) }}">
                             <i class="fa-solid fa-user-gear"></i>
                             Pegaturan Privasi
                         </a>
                     </li>
                     <li>
-                        <a
-                            class="dropdown-item mb-2"
-                            href="{{ route("logout") }}"
-                        >
+                        <a class="dropdown-item mb-2" href="{{ route('logout') }}">
                             <i class="fa-solid fa-right-from-bracket"></i>
                             Logout
                         </a>

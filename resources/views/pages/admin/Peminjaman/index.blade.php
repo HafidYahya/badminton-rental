@@ -1,0 +1,170 @@
+@extends('layouts.admin')
+
+@section('page-heading', 'Kelola Pemesanan')
+
+@section('title', 'Kelola Pemesanan')
+@section('content')
+    <div class="table-responsive">
+        <table class="table table-striped text-nowrap">
+            <thead>
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Nama Customer</th>
+                    <th scope="col">No. Hp</th>
+                    <th scope="col">Lapangan</th>
+                    <th scope="col">Harga</th>
+                    <th scope="col">Total Harga</th>
+                    <th scope="col">Tanggal</th>
+                    <th scope="col">Jam Mulai</th>
+                    <th scope="col">Jam Selesai</th>
+                    <th scope="col">Total Jam</th>
+                    <th scope="col">Bukti Pembayaran</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Alasan Cancel</th>
+                    <th scope="col">Proses</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($peminjaman as $booking)
+                    <tr>
+                        <td scope="row">{{ $loop->iteration }}</td>
+                        <td>{{ $booking->customer->c_nama_lengkap }}</td>
+                        <td>{{ $booking->customer->c_no_hp }}</td>
+                        <td>
+                            {{ $booking->lapangan->l_label }}
+                        </td>
+                        <td>Rp{{ number_format($booking->p_harga_per_jam, 0, ',', '.') }}</td>
+                        <td>Rp{{ number_format($booking->p_total_harga, 0, ',', '.') }}</td>
+                        <td>
+                            {{ Carbon\Carbon::parse($booking->p_tanggal)->locale('id')->translatedFormat('l d F Y') }}
+                        </td>
+                        <td>{{ Carbon\Carbon::parse($booking->p_jam_mulai)->locale('id')->translatedFormat('H:i') }}
+                        </td>
+                        <td>{{ Carbon\Carbon::parse($booking->p_jam_selesai)->locale('id')->translatedFormat('H:i') }}
+                        </td>
+                        <td>{{ $booking->p_total_jam }} Jam</td>
+                        <td><button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#modalBuktiPembayaran{{ $booking->p_id }}">
+                                <i class="fa fa-fw fa-eye"></i>
+                            </button></td>
+                        <td>
+                            <span
+                                class="badge 
+                            @if ($booking->p_status === 'PENDING') text-bg-secondary
+                            @elseif ($booking->p_status === 'RUNNING') text-bg-warning
+                            @elseif ($booking->p_status === 'FINISH') text-bg-success
+                            @else text-bg-danger @endif">{{ $booking->p_status }}</span>
+                        </td>
+                        <td>{{ $booking->p_alasan_cancel ?? '-' }}</td>
+                        <td><button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#modalProses{{ $booking->p_id }}">
+                                <i class="fa fa-fw fa-arrows-rotate"></i>
+                            </button></td>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            Belum ada data pemesanan
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    @foreach ($peminjaman as $booking)
+        <!-- MODAL BUKTI PEMBAYARAN-->
+        <div class="modal fade" id="modalBuktiPembayaran{{ $booking->p_id }}" data-bs-backdrop="static"
+            data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalBuktiPembayaran" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                            BUKTI PEMBAYARAN
+                        </h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-3">
+                            <img src="{{ asset('uploads/bukti-pembayaran/' . $booking->p_bukti_pembayaran) }}"
+                                alt="Foto Bukti Pembayaran" class="modal-bukti-pembayaran rounded-10 shadow" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL PROSES-->
+
+        <div class="modal fade" id="modalProses{{ $booking->p_id }}" data-bs-backdrop="static" data-bs-keyboard="false"
+            tabindex="-1" aria-labelledby="modalProses" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Proses</h5>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ route('proses.booking', $booking->p_id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="status" id="running"
+                                        value="RUNNING">
+                                    <label class="form-check-label" for="running">
+                                        RUNNING
+                                    </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="status" id="finish"
+                                        value="FINISH">
+                                    <label class="form-check-label" for="finish">
+                                        FINISH
+                                    </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="status" id="cancel"
+                                        value="CANCEL">
+                                    <label class="form-check-label" for="cancel">
+                                        CANCEL
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    Close
+                                </button>
+                                <button type="submit" class="btn btn-warning">
+                                    Proses
+                                </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+    @include('sweetalert2::index')
+@endsection
+
+@push('scripts')
+    <script>
+        // Auto close alert dalam 3 detik
+        setTimeout(() => {
+            const alertBox = document.getElementById('alertBox');
+            if (alertBox) {
+                alertBox.style.transition = 'opacity 0.5s';
+                alertBox.style.opacity = '0';
+
+                // setelah fade out, remove dari DOM
+                setTimeout(() => alertBox.remove(), 500);
+            }
+        }, 2000); // 3000 ms = 3 detik
+    </script>
+@endpush

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\HariLibur;
 use App\Models\JamOperasional;
 use App\Models\Lapangan;
@@ -153,28 +154,6 @@ class PeminjamanController extends Controller
         ]);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // FUNGSI LOGIC
     private function isJamBerurutan($jamArray)
     {
@@ -193,5 +172,34 @@ class PeminjamanController extends Controller
         }
 
         return true;
+    }
+
+    public function riwayat($id)
+    {
+        $peminjaman = Peminjaman::with(['customer', 'lapangan'])->where('p_customer_id', $id)->orderBy('created_at', 'desc')->get();
+        return view('pages.customer.riwayat', compact('peminjaman'));
+    }
+
+
+
+    // ADMIN
+    public function transaksi()
+    {
+        $peminjaman = Peminjaman::with(['customer', 'lapangan'])->orderBy('created_at', 'desc')->get();
+        return view('pages.admin.peminjaman.index', compact('peminjaman'));
+    }
+
+    public function proses(Request $request, $id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+        $peminjaman->p_status = $request->status;
+        $peminjaman->save();
+        Swal::fire([
+            'icon' => 'success',
+            'title' => 'Proses Berhasil',
+            'text' => 'Status: ' . $peminjaman->p_status,
+            'showConfirmButton' => true,
+        ]);
+        return back();
     }
 }

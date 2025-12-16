@@ -79,12 +79,16 @@ Route::middleware('admin.auth')->group(function () {
     Route::post('/hari-libur', [HariLiburController::class, 'store']);
     Route::put('/hari-libur/{id}', [HariLiburController::class, 'update']);
     Route::delete('/hari-libur/{id}', [HariLiburController::class, 'destroy']);
+    Route::get('/booking', [PeminjamanController::class, 'transaksi'])->name('transaksi.booking');
+    Route::put('/booking/{id}/proses', [PeminjamanController::class, 'proses'])->name('proses.booking');
 });
 
 Route::middleware('customer.auth')->group(function () {
     Route::get('/profile/{id}/edit',  [CustomerController::class, 'editProfileCustomer'])->name('edit.profile.customer');
     Route::put('/profile/{customer}', [CustomerController::class, 'updateProfileCustomer'])->name('edit.profile');
     Route::get('/booking/check-jam', [PeminjamanController::class, 'checkJam'])->name('booking.check-jam');
+    Route::put('/booking/{id}/cancel', [PeminjamanController::class, 'cancel'])->name('cancel.booking');
+    Route::get('/booking/riwayat/{id}', [PeminjamanController::class, 'riwayat'])->name('riwayat.booking');
     Route::get('/booking/{id}', [PeminjamanController::class, 'index'])->name('booking.index');
     Route::post('/booking', [PeminjamanController::class, 'store'])->name('booking.store');
 });

@@ -17,6 +17,20 @@
             <span>Dashboard</span>
         </a>
     </li>
+    <!-- Divider -->
+    <hr class="sidebar-divider" />
+
+    <!-- Heading -->
+    <div class="sidebar-heading">Transaksi</div>
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link {{ Route::is('transaksi.booking') ? 'active' : '' }}"
+            href="{{ route('transaksi.booking') }}">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>Kelola Pesanan</span>
+        </a>
+    </li>
 
     <!-- Divider -->
     <hr class="sidebar-divider" />
