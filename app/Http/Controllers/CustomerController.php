@@ -72,10 +72,10 @@ class CustomerController extends Controller
             'updated_at' => now(),
         ]);
         Swal::fire([
-            'title' => 'Berhasil!',
-            'text' => 'Anda berhasil mendaftar, silahkan login',
+            'title' => 'Berhasil Mendaftar',
+            'text' => 'Selamat anda berhasil mendaftar. Silahkan login untuk melanjutkan pemesanan anda',
             'icon' => 'success',
-            'showConfirmButton' => true,
+            'confirmButtonText' => 'Cool'
         ]);
         return redirect()->route('login.customer.form');
     }

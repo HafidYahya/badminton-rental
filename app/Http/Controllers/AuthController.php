@@ -11,26 +11,35 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     // Login Customer
-    public function showLoginCustomerForm(){
+    public function showLoginCustomerForm()
+    {
         return view('auth.login-customer');
     }
-    public function loginCustomer(Request $request){
-         $credentials = $request->validate(
+    public function loginCustomer(Request $request)
+    {
+        $credentials = $request->validate(
             [
-            'username' => 'required',
-            'password' => 'required',
-        ],[
-            'username.required' => 'Username tidak boleh kosong',
-            'password.required' => 'Password tidak boleh kosong',
-        ]);
+                'username' => 'required',
+                'password' => 'required',
+            ],
+            [
+                'username.required' => 'Username tidak boleh kosong',
+                'password.required' => 'Password tidak boleh kosong',
+            ]
+        );
         $user = Customer::where('c_username', $credentials['username'])->first();
 
-        if(!$user){
+        if (!$user) {
             return back()->withErrors([
                 'username' => 'Username tidak terdaftar'
             ])->onlyInput('username');
         }
-        if(!Hash::check($credentials['password'], $user->c_password)){
+        if ($user->c_status === 'INACTIVE') {
+            return back()->withErrors([
+                'username' => 'Akun anda tidak aktif'
+            ])->onlyInput('username');
+        }
+        if (!Hash::check($credentials['password'], $user->c_password)) {
             return back()->withErrors([
                 'password' => 'Password salah'
             ])->onlyInput('username');
@@ -42,29 +51,33 @@ class AuthController extends Controller
 
 
 
-    
+
     // Login Admin
-    public function showLoginAdminForm(){
+    public function showLoginAdminForm()
+    {
         return view('auth.login-admin');
     }
 
-    public function loginAdmin(Request $request){
+    public function loginAdmin(Request $request)
+    {
         $credentials = $request->validate(
             [
-            'username' => 'required',
-            'password' => 'required',
-        ],[
-            'username.required' => 'Username tidak boleh kosong',
-            'password.required' => 'Password tidak boleh kosong',
-        ]);
+                'username' => 'required',
+                'password' => 'required',
+            ],
+            [
+                'username.required' => 'Username tidak boleh kosong',
+                'password.required' => 'Password tidak boleh kosong',
+            ]
+        );
         $user = User::where('u_username', $credentials['username'])->first();
 
-        if(!$user){
+        if (!$user) {
             return back()->withErrors([
                 'username' => 'Username tidak terdaftar'
             ])->onlyInput('username');
         }
-        if(!Hash::check($credentials['password'], $user->u_password)){
+        if (!Hash::check($credentials['password'], $user->u_password)) {
             return back()->withErrors([
                 'password' => 'Password salah'
             ])->onlyInput('username');
@@ -72,8 +85,5 @@ class AuthController extends Controller
         Auth::guard('web')->login($user);
         $request->session()->regenerate();
         return redirect()->intended('/admin');
-        
     }
-
-    
 }
