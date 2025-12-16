@@ -18,59 +18,61 @@
             Tambah Lapangan
         </a>
     </div>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">No</th>
-                <th scope="col">Label</th>
-                <th scope="col">Harga</th>
-                <th scope="col">Status</th>
-                <th scope="col">Ubah Status</th>
-                <th scope="col">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($lapangan as $lp)
+    <div class="table-responsive">
+        <table class="table table-striped text-nowrap">
+            <thead>
                 <tr>
-                    <td scope="row">{{ $loop->iteration }}</td>
-                    <td>{{ $lp->l_label }}</td>
-                    <td>
-                        {{ 'Rp. ' . number_format($lp->l_harga, '0', ',', '.') }}
-                    </td>
-                    <td class="fw-bold {{ $lp->l_status === 'active' ? 'text-success' : 'text-danger' }}">
-                        {{ Str::ucfirst($lp->l_status) }}
-                    </td>
-                    <td>
-                        <a href="{{ route('lapangan.status', $lp->l_id) }}"
-                            class="btn btn-sm {{ $lp->l_status === 'active' ? 'btn-danger' : 'btn-success' }}">
-                            {{ $lp->l_status === 'active' ? 'Deactivate' : 'Activate' }}
-                        </a>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#modalDetail{{ $lp->l_id }}">
-                            <i class="fa fa-fw fa-eye"></i>
-                        </button>
-                        <a href="{{ route('lapangan.edit', $lp->l_id) }}" class="btn btn-success btn-sm">
-                            <i class="fa fa-fw fa-edit"></i>
-                            Edit
-                        </a>
-                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#modalDelete{{ $lp->l_id }}">
-                            <i class="fa fa-fw fa-trash"></i>
-                            Hapus
-                        </button>
-                    </td>
+                    <th scope="col">No</th>
+                    <th scope="col">Label</th>
+                    <th scope="col">Harga</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Ubah Status</th>
+                    <th scope="col">Aksi</th>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="text-center">
-                        Belum ada data lapangan
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @forelse ($lapangan as $lp)
+                    <tr>
+                        <td scope="row">{{ $loop->iteration }}</td>
+                        <td>{{ $lp->l_label }}</td>
+                        <td>
+                            {{ 'Rp. ' . number_format($lp->l_harga, '0', ',', '.') }}
+                        </td>
+                        <td class="fw-bold {{ $lp->l_status === 'active' ? 'text-success' : 'text-danger' }}">
+                            {{ Str::ucfirst($lp->l_status) }}
+                        </td>
+                        <td>
+                            <a href="{{ route('lapangan.status', $lp->l_id) }}"
+                                class="btn btn-sm {{ $lp->l_status === 'active' ? 'btn-danger' : 'btn-success' }}">
+                                {{ $lp->l_status === 'active' ? 'Deactivate' : 'Activate' }}
+                            </a>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#modalDetail{{ $lp->l_id }}">
+                                <i class="fa fa-fw fa-eye"></i>
+                            </button>
+                            <a href="{{ route('lapangan.edit', $lp->l_id) }}" class="btn btn-success btn-sm">
+                                <i class="fa fa-fw fa-edit"></i>
+                                Edit
+                            </a>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#modalDelete{{ $lp->l_id }}">
+                                <i class="fa fa-fw fa-trash"></i>
+                                Hapus
+                            </button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            Belum ada data lapangan
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
     @foreach ($lapangan as $lp)
         <!-- MODAL DETAIL UNTUK MENAMPILKAN DETAIL Lapangan-->
         <div class="modal fade" id="modalDetail{{ $lp->l_id }}" data-bs-backdrop="static" data-bs-keyboard="false"

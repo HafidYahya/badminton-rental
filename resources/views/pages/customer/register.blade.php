@@ -154,7 +154,31 @@
             </div>
         </div>
     </div>
-
+    <footer class="sticky-footer mt-5"
+        style="background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); border-top: 3px solid #ffb22c;">
+        <div class="container my-auto py-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <h5 class="fw-bold mb-2" style="color: #ffb22c;">
+                        WISMA HARAPAN
+                        <span style="color: #ffa500; font-style: italic;">BADMINTON</span>
+                    </h5>
+                    <p class="mb-0 small" style="color: #cccccc;">
+                        Tempat terbaik untuk bermain badminton
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="copyright" style="color: #ffb22c;">
+                        <span class="small">Copyright &copy; Muhdiatul Zannah 2025</span>
+                    </div>
+                    <div class="mt-2">
+                        <span class="small" style="color: #cccccc;">Jl. Wisma Lantana IV No.D07-No 49, RT.006/RW.011,
+                            Gembor, Kec. Periuk, Kota Tangerang, Banten 15133</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
     {{-- END CONTENT --}}
 
     <!-- Bootstrap core JavaScript-->
