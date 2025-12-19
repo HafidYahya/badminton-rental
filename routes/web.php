@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HariLiburController;
 use App\Http\Controllers\JamOperasionalController;
 use App\Http\Controllers\LapanganController;
@@ -62,9 +63,7 @@ Route::post('/customer', [CustomerController::class, 'store'])->name('customer.r
 
 
 Route::middleware('admin.auth')->group(function () {
-    Route::get('/admin', function () {
-        return view('pages.admin.dashboard');
-    })->name('dashboard');
+    Route::get('/admin', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('user', controller: UserManagementController::class);
     Route::resource('lapangan', controller: LapanganController::class);
     Route::get('/lapangan/{id}/status', [LapanganController::class, 'status'])->name('lapangan.status');
