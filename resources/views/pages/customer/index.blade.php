@@ -98,6 +98,11 @@
             @endforeach
         </div>
     </div>
+    <a href="https://wa.me/6287882000678?text=Halo%20Admin,%20saya%20ingin%20bertanya" class="wa-float" target="_blank"
+        title="Chat Admin Wisma Harapan">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
     <footer class="sticky-footer mt-5"
         style="background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); border-top: 3px solid #ffb22c;">
         <div class="container my-auto py-4">
