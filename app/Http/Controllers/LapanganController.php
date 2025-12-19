@@ -12,8 +12,8 @@ class LapanganController extends Controller
 {
     public function index(Request $request)
     {
-        $lapangan = Lapangan::when($request->status, function ($q) use ($request) {
-            $q->where('l_status', $request->status);
+        $lapangan = Lapangan::when($request->l_status, function ($q) use ($request) {
+            $q->where('l_status', $request->l_status);
         })
             ->paginate(10)
             ->withQueryString();

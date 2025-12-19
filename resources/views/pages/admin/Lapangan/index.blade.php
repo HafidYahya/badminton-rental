@@ -17,12 +17,12 @@
         <label for="status" class="form-label"><i class="fas fa-filter"></i>Status</label>
         <div class="row mb-3 g-2 align-items-center">
             <div class="col-lg-4 col-md-4 col-sm-8">
-                <select name="status" class="form-control" id="status">
+                <select name="l_status" class="form-control" id="status">
                     <option value="">-- Semua Status --</option>
-                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
+                    <option value="active" {{ request('l_status') == 'active' ? 'selected' : '' }}>
                         AKTIF
                     </option>
-                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
+                    <option value="inactive" {{ request('l_status') == 'inactive' ? 'selected' : '' }}>
                         TIDAK AKTIF
                     </option>
                 </select>

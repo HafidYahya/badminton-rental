@@ -11,9 +11,17 @@ use SweetAlert2\Laravel\Swal;
 class CustomerController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $customer = Customer::paginate(10);
+        $customer = Customer::when($request->c_status, function ($q) use ($request) {
+            $q->where('c_status', $request->c_status);
+        })
+            ->when($request->c_is_member, function ($q) use ($request) {
+                $q->where('c_is_member', $request->c_is_member);
+            })
+            ->orderBy('c_nama_lengkap', 'asc')
+            ->paginate(10)
+            ->withQueryString();
         return view('pages.admin.customer.index', compact('customer'));
     }
     public function registerForm()

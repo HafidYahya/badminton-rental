@@ -8,18 +8,18 @@
         <label for="status" class="form-label"><i class="fas fa-filter"></i>Status</label>
         <div class="row mb-3 g-2 align-items-center">
             <div class="col-lg-4 col-md-4 col-sm-8">
-                <select name="status" class="form-control" id="status">
+                <select name="p_status" class="form-control" id="status">
                     <option value="">-- Semua Status --</option>
-                    <option value="PENDING" {{ request('status') == 'PENDING' ? 'selected' : '' }}>
+                    <option value="PENDING" {{ request('p_status') == 'PENDING' ? 'selected' : '' }}>
                         PENDING
                     </option>
-                    <option value="RUNNING" {{ request('status') == 'RUNNING' ? 'selected' : '' }}>
+                    <option value="RUNNING" {{ request('p_status') == 'RUNNING' ? 'selected' : '' }}>
                         RUNNING
                     </option>
-                    <option value="FINISH" {{ request('status') == 'FINISH' ? 'selected' : '' }}>
+                    <option value="FINISH" {{ request('p_status') == 'FINISH' ? 'selected' : '' }}>
                         FINISH
                     </option>
-                    <option value="CANCEL" {{ request('status') == 'CANCEL' ? 'selected' : '' }}>
+                    <option value="CANCEL" {{ request('p_status') == 'CANCEL' ? 'selected' : '' }}>
                         CANCEL
                     </option>
                 </select>

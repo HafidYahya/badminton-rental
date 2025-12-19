@@ -2,6 +2,38 @@
 @section('title', 'Customer')
 @section('page-heading', 'Customer')
 @section('content')
+    <form method="GET">
+        <label for="status" class="form-label"><i class="fas fa-filter"></i>Filter</label>
+        <div class="row mb-3 g-2 align-items-center">
+            <div class="col-lg-4 col-md-4 col-sm-8">
+                <select name="c_status" class="form-control" id="status">
+                    <option value="">-- Semua Status --</option>
+                    <option value="active" {{ request('c_status') == 'active' ? 'selected' : '' }}>
+                        AKTIF
+                    </option>
+                    <option value="inactive" {{ request('c_status') == 'inactive' ? 'selected' : '' }}>
+                        TIDAK AKTIF
+                    </option>
+                </select>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-8">
+                <select name="c_is_member" class="form-control" id="member">
+                    <option value="">-- Semua Status Member --</option>
+                    <option value="Y" {{ request('c_is_member') == 'Y' ? 'selected' : '' }}>
+                        MEMBER
+                    </option>
+                    <option value="N" {{ request('c_is_member') == 'N' ? 'selected' : '' }}>
+                        BUKAN MEMBER
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-lg-2 col-md-2">
+                <button class="btn btn-primary w-100">Filter</button>
+            </div>
+        </div>
+
+    </form>
     <div class="table-responsive">
         <table class="table table-striped text-nowrap">
             <thead>

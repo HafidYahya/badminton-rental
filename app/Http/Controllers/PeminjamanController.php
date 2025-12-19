@@ -226,8 +226,8 @@ class PeminjamanController extends Controller
     public function transaksi(Request $request)
     {
         $peminjaman = Peminjaman::with(['customer', 'lapangan'])
-            ->when($request->status, function ($q) use ($request) {
-                $q->where('p_status', $request->status);
+            ->when($request->p_status, function ($q) use ($request) {
+                $q->where('p_status', $request->p_status);
             })
             ->orderBy('created_at', 'asc')
             ->paginate(10)
