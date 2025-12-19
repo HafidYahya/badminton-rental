@@ -10,9 +10,13 @@ use SweetAlert2\Laravel\Swal;
 
 class LapanganController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $lapangan = Lapangan::all();
+        $lapangan = Lapangan::when($request->status, function ($q) use ($request) {
+            $q->where('l_status', $request->status);
+        })
+            ->paginate(10)
+            ->withQueryString();
         return view('pages.admin.lapangan.index', compact('lapangan'));
     }
 

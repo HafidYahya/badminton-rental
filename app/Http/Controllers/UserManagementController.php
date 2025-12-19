@@ -13,7 +13,7 @@ class UserManagementController extends Controller
     // Fungsi ketika membuka menu KELOLA PENGGUNA, langsung menampilkan list mengambil data dari database dan mengirmkannya ke view dengan compact
     public function index()
     {
-        $users = User::latest()->get();
+        $users = User::latest()->paginate(10);
         return view('pages.admin.UserManagementPage.index', compact('users'));
     }
 

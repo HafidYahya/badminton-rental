@@ -4,6 +4,33 @@
 
 @section('title', 'Kelola Pemesanan')
 @section('content')
+    <form method="GET">
+        <label for="status" class="form-label"><i class="fas fa-filter"></i>Status</label>
+        <div class="row mb-3 g-2 align-items-center">
+            <div class="col-lg-4 col-md-4 col-sm-8">
+                <select name="status" class="form-control" id="status">
+                    <option value="">-- Semua Status --</option>
+                    <option value="PENDING" {{ request('status') == 'PENDING' ? 'selected' : '' }}>
+                        PENDING
+                    </option>
+                    <option value="RUNNING" {{ request('status') == 'RUNNING' ? 'selected' : '' }}>
+                        RUNNING
+                    </option>
+                    <option value="FINISH" {{ request('status') == 'FINISH' ? 'selected' : '' }}>
+                        FINISH
+                    </option>
+                    <option value="CANCEL" {{ request('status') == 'CANCEL' ? 'selected' : '' }}>
+                        CANCEL
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-lg-2 col-md-2">
+                <button class="btn btn-primary w-100">Filter</button>
+            </div>
+        </div>
+
+    </form>
     <div class="table-responsive">
         <table class="table table-striped text-nowrap">
             <thead>
@@ -27,7 +54,7 @@
             <tbody>
                 @forelse ($peminjaman as $booking)
                     <tr>
-                        <td scope="row">{{ $loop->iteration }}</td>
+                        <td scope="row">{{ $peminjaman->firstItem() + $loop->index }}</td>
                         <td>{{ $booking->customer->c_nama_lengkap }}</td>
                         <td>{{ $booking->customer->c_no_hp }}</td>
                         <td>
@@ -71,6 +98,17 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+            <p class="text-muted mb-0">
+                Menampilkan {{ $peminjaman->firstItem() ?? 0 }} - {{ $peminjaman->lastItem() ?? 0 }}
+                dari {{ $peminjaman->total() }} data
+            </p>
+        </div>
+        <div>
+            {{ $peminjaman->links() }}
+        </div>
     </div>
     @foreach ($peminjaman as $booking)
         <!-- MODAL BUKTI PEMBAYARAN-->
@@ -153,19 +191,3 @@
     @endforeach
     @include('sweetalert2::index')
 @endsection
-
-@push('scripts')
-    <script>
-        // Auto close alert dalam 3 detik
-        setTimeout(() => {
-            const alertBox = document.getElementById('alertBox');
-            if (alertBox) {
-                alertBox.style.transition = 'opacity 0.5s';
-                alertBox.style.opacity = '0';
-
-                // setelah fade out, remove dari DOM
-                setTimeout(() => alertBox.remove(), 500);
-            }
-        }, 2000); // 3000 ms = 3 detik
-    </script>
-@endpush

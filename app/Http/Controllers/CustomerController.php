@@ -13,7 +13,7 @@ class CustomerController extends Controller
 
     public function index()
     {
-        $customer = Customer::all();
+        $customer = Customer::paginate(10);
         return view('pages.admin.customer.index', compact('customer'));
     }
     public function registerForm()

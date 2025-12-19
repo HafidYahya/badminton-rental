@@ -5,19 +5,35 @@
 @section('title', 'Kelola Lapangan')
 
 @section('content')
-    {{-- ALERT --}}
-    @if (session()->has('create-success') || session()->has('delete-success') || session('edit-success'))
-        <div id="alertBox" class="alert alert-warning position-absolute top-80 start-50 translate-middle" role="alert">
-            {{ session('create-success') ?? (session('delete-success') ?? session('edit-success')) }}
-        </div>
-    @endif
-
     <div class="mb-3">
         <a href="{{ route('lapangan.create') }}" class="btn btn-primary btn-md">
             <i class="fa fa-fw fa-plus"></i>
             Tambah Lapangan
         </a>
     </div>
+
+
+    <form method="GET">
+        <label for="status" class="form-label"><i class="fas fa-filter"></i>Status</label>
+        <div class="row mb-3 g-2 align-items-center">
+            <div class="col-lg-4 col-md-4 col-sm-8">
+                <select name="status" class="form-control" id="status">
+                    <option value="">-- Semua Status --</option>
+                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
+                        AKTIF
+                    </option>
+                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>
+                        TIDAK AKTIF
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-lg-2 col-md-2">
+                <button class="btn btn-primary w-100">Filter</button>
+            </div>
+        </div>
+
+    </form>
     <div class="table-responsive">
         <table class="table table-striped text-nowrap">
             <thead>
@@ -33,7 +49,7 @@
             <tbody>
                 @forelse ($lapangan as $lp)
                     <tr>
-                        <td scope="row">{{ $loop->iteration }}</td>
+                        <td scope="row">{{ $lapangan->firstItem() + $loop->index }}</td>
                         <td>{{ $lp->l_label }}</td>
                         <td>
                             {{ 'Rp. ' . number_format($lp->l_harga, '0', ',', '.') }}
@@ -72,6 +88,17 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+            <p class="text-muted mb-0">
+                Menampilkan {{ $lapangan->firstItem() ?? 0 }} - {{ $lapangan->lastItem() ?? 0 }}
+                dari {{ $lapangan->total() }} data
+            </p>
+        </div>
+        <div>
+            {{ $lapangan->links() }}
+        </div>
     </div>
     @foreach ($lapangan as $lp)
         <!-- MODAL DETAIL UNTUK MENAMPILKAN DETAIL Lapangan-->

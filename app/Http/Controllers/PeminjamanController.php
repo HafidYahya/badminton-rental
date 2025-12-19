@@ -223,9 +223,15 @@ class PeminjamanController extends Controller
 
 
     // ADMIN
-    public function transaksi()
+    public function transaksi(Request $request)
     {
-        $peminjaman = Peminjaman::with(['customer', 'lapangan'])->orderBy('created_at', 'asc')->get();
+        $peminjaman = Peminjaman::with(['customer', 'lapangan'])
+            ->when($request->status, function ($q) use ($request) {
+                $q->where('p_status', $request->status);
+            })
+            ->orderBy('created_at', 'asc')
+            ->paginate(10)
+            ->withQueryString();
         return view('pages.admin.peminjaman.index', compact('peminjaman'));
     }
 

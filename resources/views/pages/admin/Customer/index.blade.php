@@ -2,71 +2,84 @@
 @section('title', 'Customer')
 @section('page-heading', 'Customer')
 @section('content')
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">No</th>
-                <th scope="col">Nama Lengkap</th>
-                <th scope="col">No. HP</th>
-                <th scope="col">Username</th>
-                <th scope="col">Member</th>
-                <th scope="col">Status</th>
-                <th scope="col">Tanggal Daftar</th>
-                <th scope="col">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($customer as $cs)
+    <div class="table-responsive">
+        <table class="table table-striped text-nowrap">
+            <thead>
                 <tr>
-                    <td scope="row">{{ $loop->iteration }}</td>
-                    <td>{{ $cs->c_nama_lengkap }}</td>
-                    <td>{{ $cs->c_no_hp }}</td>
-                    <td>{{ $cs->c_username }}</td>
-                    <td>
-                        <div class="dropdown">
-                            <a class="btn btn-sm {{ $cs->c_is_member === 'N' ? 'btn-light border-primary' : 'btn-success ' }} shadow-sm dropdown-toggle"
-                                href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {{ $cs->c_is_member === 'Y' ? 'Member' : 'Non Member' }}
-                            </a>
+                    <th scope="col">No</th>
+                    <th scope="col">Nama Lengkap</th>
+                    <th scope="col">No. HP</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Member</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Tanggal Daftar</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($customer as $cs)
+                    <tr>
+                        <td scope="row">{{ $customer->firstItem() + $loop->index }}</td>
+                        <td>{{ $cs->c_nama_lengkap }}</td>
+                        <td>{{ $cs->c_no_hp }}</td>
+                        <td>{{ $cs->c_username }}</td>
+                        <td>
+                            <div class="dropdown">
+                                <a class="btn btn-sm {{ $cs->c_is_member === 'N' ? 'btn-light border-primary' : 'btn-success ' }} shadow-sm dropdown-toggle"
+                                    href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{ $cs->c_is_member === 'Y' ? 'Member' : 'Non Member' }}
+                                </a>
 
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('activate.member', $cs->c_id) }}">
-                                        Member
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('deactivate.member', $cs->c_id) }}">
-                                        Non Member
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-                    <td class="fw-bold {{ $cs->c_status === 'active' ? 'text-success' : 'text-danger' }}">
-                        {{ Str::ucfirst($cs->c_status) }}
-                    </td>
-                    <td>
-                        {{ $cs->created_at->format('d F Y') }}
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#modalDetail{{ $cs->c_id }}">
-                            <i class="fa fa-fw fa-eye"></i>
-                        </button>
-                        <a href="{{ route('customer.status', $cs->c_id) }}"
-                            class="btn btn-sm {{ $cs->c_status === 'active' ? 'btn-danger' : 'btn-success' }}">
-                            {{ $cs->c_status === 'active' ? 'Deactivate Status' : 'Activate Status' }}
-                        </a>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="7" class="text-center">Belum ada data user</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('activate.member', $cs->c_id) }}">
+                                            Member
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('deactivate.member', $cs->c_id) }}">
+                                            Non Member
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                        <td class="fw-bold {{ $cs->c_status === 'active' ? 'text-success' : 'text-danger' }}">
+                            {{ Str::ucfirst($cs->c_status) }}
+                        </td>
+                        <td>
+                            {{ $cs->created_at->format('d F Y') }}
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#modalDetail{{ $cs->c_id }}">
+                                <i class="fa fa-fw fa-eye"></i>
+                            </button>
+                            <a href="{{ route('customer.status', $cs->c_id) }}"
+                                class="btn btn-sm {{ $cs->c_status === 'active' ? 'btn-danger' : 'btn-success' }}">
+                                {{ $cs->c_status === 'active' ? 'Deactivate Status' : 'Activate Status' }}
+                            </a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="8" class="text-center">Belum ada data user</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+            <p class="text-muted mb-0">
+                Menampilkan {{ $customer->firstItem() ?? 0 }} - {{ $customer->lastItem() ?? 0 }}
+                dari {{ $customer->total() }} data
+            </p>
+        </div>
+        <div>
+            {{ $customer->links() }}
+        </div>
+    </div>
 
     @foreach ($customer as $cs)
         <!-- MODAL DETAIL UNTUK MENAMPILKAN DETAIL USER-->

@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $totalPelanggan = Customer::count();
         $totalTransaksi = Peminjaman::where('p_status', 'FINISH')->count();
         $totalTransaksiBulanIni = Peminjaman::where('p_status', 'FINISH')->whereMonth('p_tanggal', Carbon::now()->month)->whereYear('p_tanggal', Carbon::now()->year)->count();
-        $totalTransaksiHariIni = Peminjaman::where('p_tanggal', Carbon::today())->count();
+        $totalTransaksiHariIni = Peminjaman::where('p_status', 'FINISH')->whereDate('p_tanggal', Carbon::today())->count();
 
         $bulanDipilih = $request->input('bulan', Carbon::now()->month);
         $tahunDipilih = $request->input('tahun', Carbon::now()->year);

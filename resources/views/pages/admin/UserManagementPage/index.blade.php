@@ -24,7 +24,7 @@
             <tbody>
                 @forelse ($users as $user)
                     <tr>
-                        <td scope="row">{{ $loop->iteration }}</td>
+                        <td scope="row">{{ $users->firstItem() + $loop->index }}</td>
                         <td>{{ $user->u_username }}</td>
                         <td>{{ $user->u_nama_lengkap }}</td>
                         <td>
@@ -52,6 +52,17 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+            <p class="text-muted mb-0">
+                Menampilkan {{ $users->firstItem() ?? 0 }} - {{ $users->lastItem() ?? 0 }}
+                dari {{ $users->total() }} data
+            </p>
+        </div>
+        <div>
+            {{ $users->links() }}
+        </div>
     </div>
     @foreach ($users as $user)
         <!-- MODAL DETAIL UNTUK MENAMPILKAN DETAIL USER-->
