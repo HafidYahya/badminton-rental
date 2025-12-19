@@ -4,7 +4,7 @@
         <div class="sidebar-brand-icon rotate-n-10">
             <i class="fa-solid fa-magnifying-glass-chart"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">BADMINTON</div>
+        <div class="sidebar-brand-text mx-3">Wisma Harapan</div>
     </a>
 
     <!-- Divider -->

@@ -394,3 +394,124 @@
 .table-riwayat {
     margin-top: 130px;
 }
+
+/* Pagination Styling */
+.pagination-wrapper {
+    border-radius: 0 0 15px 15px;
+    overflow-x: auto; /* Tambahkan ini untuk scroll horizontal jika perlu */
+}
+
+.pagination {
+    margin: 0;
+    flex-wrap: wrap; /* Agar pagination wrap ke baris baru */
+    justify-content: center;
+}
+
+.pagination .page-link {
+    color: #2c2c2c;
+    background-color: #ffffff;
+    border: 2px solid #ffb22c;
+    margin: 0 3px;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    color: #1a1a1a;
+    background: linear-gradient(135deg, #ffb22c 0%, #ffa500 100%);
+    border-color: #ffb22c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 178, 44, 0.4);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #ffb22c 0%, #ffa500 100%);
+    border-color: #ffb22c;
+    color: #1a1a1a;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(255, 178, 44, 0.4);
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #cccccc;
+    background-color: #f8f9fa;
+    border-color: #e0e0e0;
+}
+
+/* Responsive untuk Mobile */
+@media (max-width: 768px) {
+    .booking-container {
+        padding: 1rem 0.5rem;
+        margin: 100px auto 20px; /* Kurangi margin top */
+    }
+
+    .page-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .table thead th,
+    .table tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .pagination-wrapper {
+        padding: 1rem 0.5rem !important; /* Kurangi padding */
+    }
+
+    .pagination {
+        margin: 0;
+        gap: 4px; /* Jarak antar item */
+    }
+
+    .pagination .page-link {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+        margin: 0 2px;
+        min-width: 35px; /* Ukuran minimum */
+        text-align: center;
+    }
+
+    /* Hide text pada Previous/Next di mobile, hanya tampilkan icon */
+    .pagination .page-item:first-child .page-link::before {
+        content: "‹";
+    }
+
+    .pagination .page-item:last-child .page-link::before {
+        content: "›";
+    }
+}
+
+/* Untuk layar sangat kecil */
+@media (max-width: 576px) {
+    .table-card {
+        margin: 0 -0.5rem; /* Extend ke tepi layar */
+        border-radius: 10px;
+    }
+
+    .pagination-wrapper {
+        padding: 0.75rem 0.25rem !important;
+    }
+
+    .pagination .page-link {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.7rem;
+        margin: 0 1px;
+        min-width: 30px;
+    }
+
+    .pagination-wrapper .row {
+        margin: 0;
+    }
+
+    .pagination-wrapper .col-md-6 {
+        padding: 0 0.5rem;
+    }
+
+    /* Stack info dan pagination secara vertikal di mobile */
+    .pagination-wrapper .col-md-6:first-child {
+        margin-bottom: 0.75rem;
+    }
+}

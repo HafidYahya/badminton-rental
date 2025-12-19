@@ -279,7 +279,7 @@
                     <tbody>
                         @forelse ($peminjaman as $booking)
                             <tr>
-                                <td scope="row">{{ $loop->iteration }}</td>
+                                <td scope="row">{{ $peminjaman->firstItem() + $loop->index }}</td>
                                 <td><strong>{{ $booking->lapangan->l_label }}</strong></td>
                                 <td><strong
                                         style="color: #ffb22c;">Rp{{ number_format($booking->p_total_harga, 0, ',', '.') }}</strong>
@@ -324,6 +324,25 @@
                     </tbody>
                 </table>
             </div>
+            {{-- Pagination di sini --}}
+            @if ($peminjaman->hasPages())
+                <div class="pagination-wrapper"
+                    style="padding: 1.5rem; background: #f8f9fa; border-top: 2px solid #ffb22c;">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0 text-center text-md-start">
+                            <p class="mb-0 small" style="color: #666;">
+                                Menampilkan <strong
+                                    style="color: #ffb22c;">{{ $peminjaman->firstItem() ?? 0 }}</strong>
+                                sampai <strong style="color: #ffb22c;">{{ $peminjaman->lastItem() ?? 0 }}</strong>
+                                dari <strong style="color: #ffb22c;">{{ $peminjaman->total() }}</strong> pemesanan
+                            </p>
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-center justify-content-md-end">
+                            {{ $peminjaman->links() }}
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 

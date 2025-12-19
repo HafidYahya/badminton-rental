@@ -176,7 +176,7 @@ class PeminjamanController extends Controller
 
     public function riwayat($id)
     {
-        $peminjaman = Peminjaman::with(['customer', 'lapangan'])->where('p_customer_id', $id)->orderBy('created_at', 'desc')->get();
+        $peminjaman = Peminjaman::with(['customer', 'lapangan'])->where('p_customer_id', $id)->orderBy('created_at', 'desc')->paginate(10);
         return view('pages.customer.riwayat', compact('peminjaman'));
     }
     public function cancel(Request $request, $id)
