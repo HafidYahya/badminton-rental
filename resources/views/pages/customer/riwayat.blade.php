@@ -303,7 +303,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    @if ($booking->p_status === 'PENDING' || $booking->p_status === 'RUNNING')
+                                    @if ($booking->p_status === 'PENDING')
                                         <button type="button" class="btn btn-cancel btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#modalCancel{{ $booking->p_id }}">
                                             <i class="fas fa-times mr-1"></i> Cancel
