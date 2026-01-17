@@ -122,7 +122,7 @@ class PeminjamanController extends Controller
         // Jam operasional
         $operasional = JamOperasional::where('jo_hari', $hari)->first();
 
-        if (!$operasional || $operasional->jo_is_hari_libur) {
+        if (!$operasional || $operasional->jo_is_hari_libur || $libur) {
             return response()->json([
                 'libur' => true
             ]);
