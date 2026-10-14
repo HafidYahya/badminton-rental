@@ -1,0 +1,176 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Support\Facades\File;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use SweetAlert2\Laravel\Swal;
+
+class UserManagementController extends Controller
+{
+    // Fungsi ketika membuka menu KELOLA PENGGUNA, langsung menampilkan list mengambil data dari database dan mengirmkannya ke view dengan compact
+    public function index()
+    {
+        $users = User::orderBy('u_nama_lengkap', 'asc')->paginate(10);
+        return view('pages.admin.UserManagementPage.index', compact('users'));
+    }
+
+    public function create()
+    {
+        return view('pages.admin.UserManagementPage.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'username'      => 'required|min:5|unique:users,u_username|alpha_dash',
+            'nama_lengkap'  => 'required|max:20|regex:/^[A-Za-z\s]+$/',
+            'password'      => 'required|min:8|max:100',
+            'konfirmasi_password' => 'required|same:password',
+            'foto_profile'  => 'mimes:jpg,jpeg,png,webp,heic|max:2048',
+        ], [
+            'username.required' => 'Username tidak boleh kosong',
+            'username.min' => 'Username minimal harus 5 karakter',
+            'username.unique' => 'Username ini sudah digunakan',
+            'username.alpha_dash' => 'Username tidak boleh ada spasi',
+            'nama_lengkap.max' => 'Maksimal 20 karakter',
+            'nama_lengkap.regex' => 'Tidak boleh menggunakan nomor atau simbol',
+            'nama_lengkap.required' => 'Nama lengkap tidak boleh kosong',
+            'password.required' => 'Password tidak boleh kosong',
+            'password.min' => 'Password minimal 8 karakter',
+            'password.max' => 'Password maksimal 100 karakter',
+            'konfirmasi_password.same' => 'Password tidak cocok',
+            'foto_profile.mimes' => 'Format file harus JPG, JPEG, PNG, WEBP, atau HEIC',
+            'foto_profile.max' => 'Maksimal Size 2 MB',
+        ]);
+
+        // Validasi apakah ada foto yang di upload
+        $filename = 'undraw_profile.svg'; //Ini Profile Default
+        if ($request->hasFile('foto_profile')) {
+
+            $file = $request->file('foto_profile');
+
+            // Nama File Baru
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+
+            // Pindahkan ke folder uploads/users
+            $file->move(public_path('/uploads/users'), $filename); //Parameter pertama adalah path, parameter kedua adalah nama file
+        }
+
+        // Insert Ke database (Table Users)
+        DB::table('users')->insert([
+            'u_username' => $request->username,
+            'u_nama_lengkap' => $request->nama_lengkap,
+            'u_foto_profil' => $filename,
+            'u_password' => bcrypt($request->password),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Swal::fire([
+            'toast' => true,
+            'position' => 'top-end',
+            'icon' => 'success',
+            'title' => 'Pengguna baru berhasil ditambahkan',
+            'showConfirmButton' => false,
+            'timer' => 3000,
+            'timerProgressBar' => true,
+        ]);
+
+        return redirect()->route('user.index');
+    }
+
+    // Fungsi untuk menampilkan halaman Edit
+    public function edit(User $user)
+    {
+        return view('pages.admin.UserManagementPage.edit', compact('user'));
+    }
+
+
+    public function update(Request $request, User $user)
+    {
+        $request->validate([
+            'username'      => 'required|min:5|unique:users,u_username,' . $user->u_id . ',u_id',
+            'nama_lengkap'  => 'required|max:20|regex:/^[A-Za-z\s]+$/',
+            'password'      => 'nullable|min:8|max:100',
+            'konfirmasi_password' => 'nullable|same:password',
+            'foto_profile'  => 'mimes:jpg,jpeg,png,webp,heic|max:2048',
+        ], [
+            'username.min' => 'Username minimal harus 5 karakter',
+            'username.unique' => 'Username ini sudah digunakan',
+            'username.alpha_dash' => 'Username tidak boleh ada spasi',
+            'nama_lengkap.max' => 'Maksimal 20 karakter',
+            'nama_lengkap.regex' => 'Tidak boleh menggunakan nomor atau simbol',
+            'password.min' => 'Password minimal 8 karakter',
+            'password.max' => 'Password maksimal 100 karakter',
+            'konfirmasi_password.same' => 'Password tidak cocok',
+            'foto_profile.mimes' => 'Format file harus JPG, JPEG, PNG, WEBP, atau HEIC',
+        ]);
+        // Update field dasar
+        $user->u_username = $request->username;
+        $user->u_nama_lengkap = $request->nama_lengkap;
+
+        // Update password jika diisi
+        if ($request->filled('password')) {
+            $user->u_password = bcrypt($request->password);
+        }
+
+        // Update foto profile jika ada file baru
+        if ($request->hasFile('foto_profile')) {
+            // Hapus foto lama jika ada
+            if ($user->u_foto_profil && File::exists(public_path('uploads/users/' . $user->u_foto_profil))) {
+                if ($user->u_foto_profil !== 'undraw_profile.svg') {
+                    File::delete(public_path('uploads/users/' . $user->u_foto_profil));
+                }
+            }
+            // Simpan file baru
+            $file = $request->file('foto_profile');
+            $fileName = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/users'), $fileName);
+            $user->u_foto_profil = $fileName;
+        }
+
+        $user->save();
+        Swal::fire([
+            'toast' => true,
+            'position' => 'top-end',
+            'icon' => 'success',
+            'title' => 'Data pengguna berhasil diubah',
+            'showConfirmButton' => false,
+            'timer' => 3000,
+            'timerProgressBar' => true,
+        ]);
+        return redirect()->route('user.index');
+    }
+
+
+    public function destroy($id)
+    {
+        $user = User::find($id);
+        if ($user->u_foto_profil && File::exists(public_path('uploads/users/' . $user->u_foto_profil))) {
+            if ($user->u_foto_profil !== 'undraw_profile.svg') {
+                File::delete(public_path('uploads/users/' . $user->u_foto_profil));
+            }
+        }
+        $user->delete();
+        Swal::fire([
+            'toast' => true,
+            'position' => 'top-end',
+            'icon' => 'success',
+            'title' => 'Berhasil menghapus pengguna',
+            'showConfirmButton' => false,
+            'timer' => 3000,
+            'timerProgressBar' => true,
+        ]);
+        return redirect()->route('user.index')->with('success', 'User berhasil dihapus');
+    }
+
+    public function search(Request $request)
+    {
+        $keyword = $request->query('search', '');
+        $users = User::where('u_username', 'ilike', "%{$keyword}%")
+            ->get(['u_id', 'u_username', 'u_nama_lengkap', 'u_foto_profil', 'created_at', 'updated_at']);
+        return response()->json($users);
+    }
+}
