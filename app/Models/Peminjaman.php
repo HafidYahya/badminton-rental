@@ -13,8 +13,6 @@ class Peminjaman extends Model
     protected $casts = [
         'p_jam_mulai' => 'datetime',
         'p_jam_selesai' => 'datetime',
-        'p_expired_at' => 'datetime',
-        'p_completed_at' => 'datetime',
     ];
 
     public function customer()
@@ -25,5 +23,15 @@ class Peminjaman extends Model
     public function lapangan()
     {
         return $this->belongsTo(Lapangan::class, 'p_lapangan_id', 'l_id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'peminjaman_id', 'p_id');
+    }
+
+    public function latestOrder()
+    {
+        return $this->hasOne(Order::class, 'peminjaman_id', 'p_id')->latestOfMany();
     }
 }

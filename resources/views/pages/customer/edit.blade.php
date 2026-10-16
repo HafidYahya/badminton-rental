@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="utf-8" />
@@ -29,19 +29,27 @@
 <body class="register-bg">
     @include('components.navbar-customer-after-login')
     {{-- CONTENT --}}
-    <div class="container d-flex justify-content-center min-vh-100 py-5 my-5 align-items-md-center">
-        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
-            <div class="card p-2 mb-3 border-secondary shadow-sm">
-                <div class="card-body">
+    <main class="container profile-page">
+        <section class="profile-card" aria-labelledby="profileTitle">
+            <header class="profile-card-header">
                     @if ($customer->c_foto_profile)
                         <img src="{{ asset('uploads/customers/' . $customer->c_foto_profile) }}" alt="Foto Profile"
-                            class="profile-edit-customer mb-3 mx-auto d-block rounded-circle shadow" />
+                            class="profile-edit-customer rounded-circle shadow" />
+                    @else
+                        <span class="profile-avatar-placeholder" aria-hidden="true">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
                     @endif
-
-                    <hr />
+                    <div>
+                        <p class="profile-eyebrow">PENGATURAN AKUN</p>
+                        <h1 id="profileTitle">Profil Saya</h1>
+                        <p>Perbarui informasi akun dan preferensi profil Anda.</p>
+                    </div>
+            </header>
+            <div class="profile-card-body">
 
                     <form action="{{ route('edit.profile', $customer->c_id) }}" method="POST"
-                        enctype="multipart/form-data">
+                        enctype="multipart/form-data" class="profile-form">
                         @csrf
                         @method('PUT')
 
@@ -50,7 +58,7 @@
                                 Nama Lengkap*
                             </label>
                             <input type="text" class="form-control shadow-sm" id="nama_lengkap"
-                                placeholder="Masukan nama lengkap" name="nama_lengkap"
+                                placeholder="Masukkan nama lengkap" name="nama_lengkap"
                                 value="{{ old('nama_lengkap', $customer->c_nama_lengkap) }}" />
                             @error('nama_lengkap')
                                 <p class="text-danger fst-italic">
@@ -63,8 +71,8 @@
                             <label for="no_hp" class="form-label">
                                 Nomor HP*
                             </label>
-                            <input type="number" class="form-control shadow-sm" id="no_hp"
-                                placeholder="Masukan nomor handphone" name="no_hp"
+                            <input type="tel" class="form-control shadow-sm" id="no_hp"
+                                placeholder="Masukkan nomor handphone" name="no_hp"
                                 value="{{ old('no_hp', $customer->c_no_hp) }}" />
                             @error('no_hp')
                                 <p class="text-danger fst-italic">
@@ -78,7 +86,7 @@
                                 Username*
                             </label>
                             <input type="text" class="form-control shadow-sm" id="username"
-                                placeholder="Masukan username" name="username"
+                                placeholder="Masukkan username" name="username"
                                 value="{{ old('username', $customer->c_username) }}" />
                             @error('username')
                                 <p class="text-danger fst-italic">
@@ -112,7 +120,7 @@
                                 </p>
                             @enderror
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3 profile-form-wide">
                             <label for="alamat" class="form-label">
                                 Alamat Lengkap
                             </label>
@@ -124,52 +132,47 @@
                                 </p>
                             @enderror
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3 profile-form-wide">
                             <label for="foto_profile" class="form-label">
                                 Foto Profile
                             </label>
                             <input type="file" class="form-control shadow-sm" id="foto_profile"
-                                name="foto_profile" />
+                                name="foto_profile" accept="image/*" />
                             @error('foto_profile')
                                 <p class="text-danger fst-italic">
                                     {{ $message }}
                                 </p>
                             @enderror
                         </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-dark border-secondary rounded-pill mb-2">
-                                Save
+                        <div class="profile-form-actions">
+                            <a href="{{ url('/') }}" class="btn profile-cancel-button">Kembali</a>
+                            <button type="submit" class="btn profile-save-button">
+                                <i class="fa-solid fa-floppy-disk me-2" aria-hidden="true"></i>Simpan Perubahan
                             </button>
                         </div>
                     </form>
                 </div>
-            </div>
-        </div>
-    </div>
-    <a href="https://wa.me/6287882000678?text=Halo%20Admin,%20saya%20ingin%20bertanya" class="wa-float" target="_blank"
-        title="Chat Admin Wisma Harapan">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-    <footer class="sticky-footer mt-5"
-        style="background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); border-top: 3px solid #ffb22c;">
+        </section>
+    </main>
+    <footer class="sticky-footer customer-footer mt-5">
         <div class="container my-auto py-4">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <h5 class="fw-bold mb-2" style="color: #ffb22c;">
-                        WISMA HARAPAN
-                        <span style="color: #ffa500; font-style: italic;">BADMINTON</span>
+                    <h5 class="customer-footer-brand fw-bold mb-2">
+                        BADMINTON RENTAL
+                        <span class="customer-footer-accent">BADMINTON</span>
                     </h5>
-                    <p class="mb-0 small" style="color: #cccccc;">
+                    <p class="customer-footer-description mb-0 small">
                         Tempat terbaik untuk bermain badminton
                     </p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <div class="copyright" style="color: #ffb22c;">
-                        <span class="small">Copyright &copy; Muhdiatul Zannah 2025</span>
+                    <div class="copyright customer-footer-copyright">
+                        <span class="small">Copyright &copy; Hafid Yahya {{ date('Y') }}</span>
                     </div>
                     <div class="mt-2">
-                        <span class="small" style="color: #cccccc;">Jl. Wisma Lantana IV No.D07-No 49, RT.006/RW.011,
-                            Gembor, Kec. Periuk, Kota Tangerang, Banten 15133</span>
+                        <span class="customer-footer-details small">Layanan peminjaman lapangan badminton.
+                            Aplikasi pemesanan dan pengelolaan lapangan.</span>
                     </div>
                 </div>
             </div>

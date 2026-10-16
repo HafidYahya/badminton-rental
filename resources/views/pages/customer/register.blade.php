@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="utf-8" />
@@ -33,29 +33,28 @@
     @else
         @include('components.navbar-customer-before-login')
     @endif
-    <div class="container d-flex justify-content-center min-vh-100 py-5 align-items-md-center">
-        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
-            <div class="card p-2 mb-3 border-secondary shadow-sm">
+    <main class="container auth-container auth-container-customer auth-register-container">
+        <section class="col-12 col-sm-10 col-md-8 col-lg-7" aria-labelledby="registerTitle">
+            <div class="card auth-card auth-register-card shadow-sm">
                 <div class="card-body">
-                    <h3 class="card-title text-start fw-bold mb-2">
-                        Selamat Datang
-                        <i class="fa-solid fa-hands-clapping"></i>
-                    </h3>
-                    <p class="text-secondary text-start mb 3">
-                        Daftar sekarang untuk melakukan pemesanan lapangan
-                        secara online
+                    <a class="auth-brand" href="{{ url('/') }}">BADMINTON RENTAL</a>
+                    <p class="auth-eyebrow mt-3">BUAT AKUN CUSTOMER</p>
+                    <h1 id="registerTitle" class="auth-title">Mulai pesan lapangan</h1>
+                    <p class="auth-description">
+                        Daftar untuk memesan dan mengelola pemesanan lapangan secara online.
                     </p>
-                    <hr />
 
-                    <form action="{{ route('customer.register') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('customer.register') }}" method="POST" enctype="multipart/form-data"
+                        class="auth-form">
                         @csrf
 
                         <div class="mb-3">
                             <label for="nama_lengkap" class="form-label">
                                 Nama Lengkap*
                             </label>
-                            <input type="text" class="form-control shadow-sm" id="nama_lengkap"
-                                placeholder="Masukan nama lengkap" name="nama_lengkap" />
+                            <input type="text" class="form-control" id="nama_lengkap"
+                                placeholder="Masukkan nama lengkap" name="nama_lengkap" autocomplete="name"
+                                value="{{ old('nama_lengkap') }}" required />
                             @error('nama_lengkap')
                                 <p class="text-danger fst-italic">
                                     {{ $message }}
@@ -67,8 +66,9 @@
                             <label for="no_hp" class="form-label">
                                 Nomor HP*
                             </label>
-                            <input type="number" class="form-control shadow-sm" id="no_hp"
-                                placeholder="Masukan nomor handphone" name="no_hp" />
+                            <input type="tel" class="form-control" id="no_hp"
+                                placeholder="Masukkan nomor handphone" name="no_hp" autocomplete="tel"
+                                value="{{ old('no_hp') }}" required />
                             @error('no_hp')
                                 <p class="text-danger fst-italic">
                                     {{ $message }}
@@ -80,8 +80,9 @@
                             <label for="username" class="form-label">
                                 Username*
                             </label>
-                            <input type="text" class="form-control shadow-sm" id="username"
-                                placeholder="Masukan username" name="username" />
+                            <input type="text" class="form-control" id="username"
+                                placeholder="Masukkan username" name="username" autocomplete="username"
+                                value="{{ old('username') }}" required />
                             @error('username')
                                 <p class="text-danger fst-italic">
                                     {{ $message }}
@@ -93,7 +94,8 @@
                             <label for="password" class="form-label">
                                 Password*
                             </label>
-                            <input type="password" class="form-control shadow-sm" id="password" name="password" />
+                            <input type="password" class="form-control" id="password" name="password"
+                                autocomplete="new-password" required />
                             @error('password')
                                 <p class="text-danger fst-italic">
                                     {{ $message }}
@@ -105,8 +107,8 @@
                             <label for="konfirmasi_password" class="form-label">
                                 Konfirmasi Password*
                             </label>
-                            <input type="password" class="form-control shadow-sm" id="konfirmasi_password"
-                                name="konfirmasi_password" />
+                            <input type="password" class="form-control" id="konfirmasi_password"
+                                name="konfirmasi_password" autocomplete="new-password" required />
                             @error('konfirmasi_password')
                                 <p class="text-danger fst-italic">
                                     {{ $message }}
@@ -117,7 +119,7 @@
                             <label for="alamat" class="form-label">
                                 Alamat Lengkap
                             </label>
-                            <textarea name="alamat" id="alamat" class="form-control shadow-sm"></textarea>
+                            <textarea name="alamat" id="alamat" class="form-control" rows="3">{{ old('alamat') }}</textarea>
                             @error('alamat')
                                 <p class="text-danger fst-italic">
                                     {{ $message }}
@@ -128,8 +130,8 @@
                             <label for="foto_profile" class="form-label">
                                 Foto Profile
                             </label>
-                            <input type="file" class="form-control shadow-sm" id="foto_profile"
-                                name="foto_profile" />
+                            <input type="file" class="form-control" id="foto_profile" name="foto_profile"
+                                accept="image/*" />
                             @error('foto_profile')
                                 <p class="text-danger fst-italic">
                                     {{ $message }}
@@ -137,7 +139,7 @@
                             @enderror
                         </div>
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-dark border-secondary rounded-pill mb-2">
+                            <button type="submit" class="btn auth-submit mb-2">
                                 Daftar
                             </button>
                         </div>
@@ -152,32 +154,27 @@
                     </form>
                 </div>
             </div>
-        </div>
-    </div>
-    <a href="https://wa.me/6287882000678?text=Halo%20Admin,%20saya%20ingin%20bertanya" class="wa-float" target="_blank"
-        title="Chat Admin Wisma Harapan">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-    <footer class="sticky-footer mt-5"
-        style="background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); border-top: 3px solid #ffb22c;">
+        </section>
+    </main>
+    <footer class="sticky-footer customer-footer mt-5">
         <div class="container my-auto py-4">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <h5 class="fw-bold mb-2" style="color: #ffb22c;">
-                        WISMA HARAPAN
-                        <span style="color: #ffa500; font-style: italic;">BADMINTON</span>
+                    <h5 class="customer-footer-brand fw-bold mb-2">
+                        BADMINTON RENTAL
+                        <span class="customer-footer-accent">BADMINTON</span>
                     </h5>
-                    <p class="mb-0 small" style="color: #cccccc;">
+                    <p class="customer-footer-description mb-0 small">
                         Tempat terbaik untuk bermain badminton
                     </p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <div class="copyright" style="color: #ffb22c;">
-                        <span class="small">Copyright &copy; Muhdiatul Zannah 2025</span>
+                    <div class="copyright customer-footer-copyright">
+                        <span class="small">Copyright &copy; Hafid Yahya {{ date('Y') }}</span>
                     </div>
                     <div class="mt-2">
-                        <span class="small" style="color: #cccccc;">Jl. Wisma Lantana IV No.D07-No 49, RT.006/RW.011,
-                            Gembor, Kec. Periuk, Kota Tangerang, Banten 15133</span>
+                        <span class="customer-footer-details small">Layanan peminjaman lapangan badminton.
+                            Aplikasi pemesanan dan pengelolaan lapangan.</span>
                     </div>
                 </div>
             </div>

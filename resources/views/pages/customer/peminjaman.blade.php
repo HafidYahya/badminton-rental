@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="utf-8" />
@@ -8,7 +8,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <title>BOOKING LAPANGAN - WISMA HARAPAN</title>
+    <title>BOOKING LAPANGAN - BADMINTON RENTAL</title>
     {{-- GOOGLE FONT --}}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -62,49 +62,51 @@
 
     {{-- Font Awesome --}}
     <link rel="stylesheet" href="{{ asset('fontawesome/css/all.min.css') }}" />
+</head>
 
-
-<body>
+<body class="customer-booking-page">
     {{-- CONTENT --}}
     @include('components.navbar-customer-after-login')
-    <div class="main-section-peminjaman">
-        <div class="container-fluid">
+    <main class="customer-booking-main">
+    <section class="booking-court-section" aria-labelledby="bookingCourtTitle">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-6 col-md-6 col-sm-12 mb-3">
-                    <div class="card booking-card shadow-lg">
-                        <div class="card-body">
+                    <figure class="card booking-card booking-court-media shadow-sm">
+                        <div class="card-body p-0">
                             <img class="img-fluid rounded shadow-sm"
-                                src="{{ asset('uploads/lapangan/' . $lapangan->l_foto) }}" alt="Foto Lapangan">
+                                src="{{ asset('uploads/lapangan/' . $lapangan->l_foto) }}"
+                                alt="Lapangan {{ $lapangan->l_label }}">
                         </div>
-                    </div>
+                    </figure>
 
                 </div>
                 <div class="col-lg-6 col-md-6 col-sm-12 mb-3">
-                    <h2 class="booking-lapangan-title">{{ $lapangan->l_label }}</h2>
-                    <h5 class="mb-3">
-                        Harga/Jam :
-                        <span class="booking-lapangan-price">Rp
-                            {{ number_format($lapangan->l_harga, 0, ',', '.') }}</span>
-                    </h5>
-                    <div class="card booking-card shadow-lg">
+                    <header class="booking-court-heading">
+                        <p class="booking-court-eyebrow">DETAIL LAPANGAN</p>
+                        <h1 id="bookingCourtTitle" class="booking-lapangan-title">{{ $lapangan->l_label }}</h1>
+                        <p class="booking-court-price-label">Harga per jam</p>
+                        <p class="booking-lapangan-price">Rp{{ number_format($lapangan->l_harga, 0, ',', '.') }}</p>
+                    </header>
+                    <section class="card booking-card booking-description-card shadow-sm" aria-labelledby="descriptionTitle">
                         <div class="card-header booking-card-header">
-                            <h5 class="mb-0"><i class="fas fa-align-left mr-2"></i>Deskripsi</h5>
+                            <h2 id="descriptionTitle" class="mb-0"><i class="fas fa-align-left me-2" aria-hidden="true"></i>Deskripsi</h2>
                         </div>
                         <div class="card-body">{!! $lapangan->l_deskripsi !!}</div>
-                    </div>
+                    </section>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
     {{-- BOOKING FORM SECTION --}}
-    <div class="booking-form-section">
-        <div class="container-fluid">
+    <section class="booking-form-section" aria-labelledby="bookingFormTitle">
+        <div class="container">
             <div class="row">
                 <div class="col-12">
-                    <div class="card booking-card shadow-lg">
+                    <div class="card booking-card booking-form-card shadow-sm">
                         <div class="card-header booking-card-header">
-                            <h5 class="mb-0"><i class="fas fa-calendar-check mr-2"></i>Form Pemesanan</h5>
+                            <h2 id="bookingFormTitle" class="mb-0"><i class="fas fa-calendar-check me-2" aria-hidden="true"></i>Atur Pemesanan</h2>
                         </div>
                         <div class="card-body">
                             <form action="{{ route('booking.store') }}" method="POST" id="bookingForm">
@@ -116,7 +118,7 @@
 
 
                                 {{-- Pilih Tanggal --}}
-                                <div class="form-group">
+                                <div class="form-group booking-date-field">
                                     <label for="tanggal_booking"><strong class="booking-label-strong">Pilih
                                             Tanggal</strong></label>
                                     <input type="date" class="form-control booking-form-control-date"
@@ -124,7 +126,7 @@
                                 </div>
 
                                 {{-- Pilih Jam --}}
-                                <div class="form-group">
+                                <div class="form-group booking-time-field">
                                     <label><strong class="booking-label-strong">Pilih Jam</strong></label>
                                     <small class="text-muted d-block mb-3">Klik pada jam yang ingin Anda booking (dapat
                                         memilih lebih dari satu)</small>
@@ -151,7 +153,7 @@
                                 </div>
 
                                 {{-- Ringkasan Booking --}}
-                                <div class="form-group d-none   ">
+                                <div class="form-group booking-summary-field">
                                     <div class="alert booking-alert-info" id="ringkasanBooking" style="display: none;">
                                         <h6><i class="fas fa-info-circle booking-info-icon mr-2"></i>Ringkasan Pemesanan
                                         </h6>
@@ -174,11 +176,12 @@
                                 {{-- Metode Pembayaran --}}
                                 <div class="form-group mb-4">
                                     <label class="booking-label-strong d-block mb-2">Metode Pembayaran</label>
-                                    <div class="d-flex gap-2">
+                                    <div class="booking-payment-options">
                                         <label for="paymentMethodQris" class="payment-option">
                                             <input type="radio" name="payment_method" id="paymentMethodQris"
                                                 value="qris" required>
                                             <img src="{{ asset('assets/qris_icon.png') }}" alt="QRIS">
+                                            <span><strong>QRIS</strong><small>Bayar dengan aplikasi pembayaran pilihan Anda</small></span>
                                         </label>
                                     </div>
                                 </div>
@@ -195,31 +198,27 @@
                 </div>
             </div>
         </div>
-    </div>
-    <a href="https://wa.me/6287882000678?text=Halo%20Admin,%20saya%20ingin%20bertanya" class="wa-float"
-        target="_blank" title="Chat Admin Wisma Harapan">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-    <footer class="sticky-footer mt-5"
-        style="background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); border-top: 3px solid #ffb22c;">
+    </section>
+    </main>
+    <footer class="sticky-footer customer-footer mt-5">
         <div class="container my-auto py-4">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <h5 class="fw-bold mb-2" style="color: #ffb22c;">
-                        WISMA HARAPAN
-                        <span style="color: #ffa500; font-style: italic;">BADMINTON</span>
+                    <h5 class="customer-footer-brand fw-bold mb-2">
+                        BADMINTON RENTAL
+                        <span class="customer-footer-accent">BADMINTON</span>
                     </h5>
-                    <p class="mb-0 small" style="color: #cccccc;">
+                    <p class="customer-footer-description mb-0 small">
                         Tempat terbaik untuk bermain badminton
                     </p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <div class="copyright" style="color: #ffb22c;">
-                        <span class="small">Copyright &copy; Muhdiatul Zannah 2025</span>
+                    <div class="copyright customer-footer-copyright">
+                        <span class="small">Copyright &copy; Hafid Yahya {{ date('Y') }}</span>
                     </div>
                     <div class="mt-2">
-                        <span class="small" style="color: #cccccc;">Jl. Wisma Lantana IV No.D07-No 49, RT.006/RW.011,
-                            Gembor, Kec. Periuk, Kota Tangerang, Banten 15133</span>
+                        <span class="customer-footer-details small">Layanan peminjaman lapangan badminton.
+                            Aplikasi pemesanan dan pengelolaan lapangan.</span>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="utf-8" />
@@ -8,7 +8,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <title>BOOKING LAPANGAN - WISMA HARAPAN</title>
+    <title>BOOKING LAPANGAN - BADMINTON RENTAL</title>
     {{-- GOOGLE FONT --}}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,7 +34,7 @@
         .booking-container {
             padding: 2rem 1rem;
             max-width: 1400px;
-            margin: 120px auto;
+            margin: 3rem auto 4rem;
         }
 
         .page-header {
@@ -254,13 +254,14 @@
     {{-- CONTENT --}}
     @include('components.navbar-customer-after-login')
 
-    <div class="booking-container">
-        <div class="page-header">
-            <h2><i class="fas fa-calendar-check mr-2"></i>Riwayat Booking Lapangan</h2>
-            <p>Kelola dan pantau semua pemesanan lapangan Anda</p>
-        </div>
+    <main class="booking-container booking-history-page">
+        <header class="page-header booking-history-header">
+            <p class="booking-history-eyebrow">AKUN CUSTOMER</p>
+            <h1><i class="fas fa-calendar-check me-2" aria-hidden="true"></i>Riwayat Booking</h1>
+            <p>Kelola dan pantau status pemesanan lapangan Anda.</p>
+        </header>
 
-        <div class="table-card">
+        <section class="table-card" aria-label="Daftar pemesanan">
             <div class="table-responsive">
                 <table class="table table-hover text-nowrap">
                     <thead>
@@ -283,12 +284,12 @@
                             <tr>
                                 <td scope="row">{{ $peminjaman->firstItem() + $loop->index }}</td>
                                 <td><strong>{{ $booking->lapangan->l_label }}</strong></td>
-                                <td>{{ strtoupper($booking->p_payment_method ?? '-') }}</td>
-                                <td><strong
-                                        style="color: #ffb22c;">Rp{{ number_format($booking->p_total_harga, 0, ',', '.') }}</strong>
+                                <td>{{ strtoupper($booking->latestOrder?->payment_method ?? '-') }}</td>
+                                <td><strong class="booking-history-amount">
+                                        Rp{{ number_format($booking->p_total_harga, 0, ',', '.') }}</strong>
                                 </td>
-                                <td><strong
-                                        style="color: #1a1a1a;">Rp{{ number_format($booking->p_total_payment ?? $booking->p_total_harga, 0, ',', '.') }}</strong>
+                                <td><strong class="booking-history-total">
+                                        Rp{{ number_format($booking->latestOrder?->total_payment ?? $booking->p_total_harga, 0, ',', '.') }}</strong>
                                 </td>
                                 <td>
                                     {{ Carbon\Carbon::parse($booking->p_tanggal)->locale('id')->translatedFormat('l, d F Y') }}
@@ -298,7 +299,11 @@
                                 <td>{{ Carbon\Carbon::parse($booking->p_jam_selesai)->locale('id')->translatedFormat('H:i') }}
                                 </td>
                                 <td>
-                                    {{ $booking->p_expired_at ? Carbon\Carbon::parse($booking->p_expired_at)->locale('id')->translatedFormat('l, d F Y H:i') : '-' }}
+                                    @if ($booking->latestOrder?->expires_at)
+                                        {{ Carbon\Carbon::parse($booking->latestOrder->expires_at)->locale('id')->translatedFormat('l, d F Y H:i') }}
+                                    @else
+                                        -
+                                    @endif
                                 </td>
                                 <td>
                                     <span
@@ -323,7 +328,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9">
+                                <td colspan="11">
                                     <div class="empty-state">
                                         <i class="fas fa-clipboard-list"></i>
                                         <p>Belum ada data pemesanan</p>
@@ -336,15 +341,13 @@
             </div>
             {{-- Pagination di sini --}}
             @if ($peminjaman->hasPages())
-                <div class="pagination-wrapper"
-                    style="padding: 1.5rem; background: #f8f9fa; border-top: 2px solid #ffb22c;">
+                <div class="pagination-wrapper booking-history-pagination">
                     <div class="row align-items-center">
                         <div class="col-md-6 mb-3 mb-md-0 text-center text-md-start">
-                            <p class="mb-0 small" style="color: #666;">
-                                Menampilkan <strong
-                                    style="color: #ffb22c;">{{ $peminjaman->firstItem() ?? 0 }}</strong>
-                                sampai <strong style="color: #ffb22c;">{{ $peminjaman->lastItem() ?? 0 }}</strong>
-                                dari <strong style="color: #ffb22c;">{{ $peminjaman->total() }}</strong> pemesanan
+                            <p class="mb-0 small">
+                                Menampilkan <strong>{{ $peminjaman->firstItem() ?? 0 }}</strong>
+                                sampai <strong>{{ $peminjaman->lastItem() ?? 0 }}</strong>
+                                dari <strong>{{ $peminjaman->total() }}</strong> pemesanan
                             </p>
                         </div>
                         <div class="col-md-6 d-flex justify-content-center justify-content-md-end">
@@ -353,12 +356,12 @@
                     </div>
                 </div>
             @endif
-        </div>
-    </div>
+        </section>
+    </main>
 
     @foreach ($peminjaman as $booking)
         <!-- MODAL Cancel-->
-        <div class="modal fade" id="modalCancel{{ $booking->p_id }}" data-bs-backdrop="static" data-bs-keyboard="false"
+        <div class="modal fade booking-cancel-modal" id="modalCancel{{ $booking->p_id }}" data-bs-backdrop="static" data-bs-keyboard="false"
             tabindex="-1" aria-labelledby="modalCancel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -400,30 +403,25 @@
             </div>
         </div>
     @endforeach
-    <a href="https://wa.me/6287882000678?text=Halo%20Admin,%20saya%20ingin%20bertanya" class="wa-float"
-        target="_blank" title="Chat Admin Wisma Harapan">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-    <footer class="sticky-footer mt-5"
-        style="background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); border-top: 3px solid #ffb22c;">
+    <footer class="sticky-footer customer-footer mt-5">
         <div class="container my-auto py-4">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <h5 class="fw-bold mb-2" style="color: #ffb22c;">
-                        WISMA HARAPAN
-                        <span style="color: #ffa500; font-style: italic;">BADMINTON</span>
+                    <h5 class="customer-footer-brand fw-bold mb-2">
+                        BADMINTON RENTAL
+                        <span class="customer-footer-accent">BADMINTON</span>
                     </h5>
-                    <p class="mb-0 small" style="color: #cccccc;">
+                    <p class="customer-footer-description mb-0 small">
                         Tempat terbaik untuk bermain badminton
                     </p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <div class="copyright" style="color: #ffb22c;">
-                        <span class="small">Copyright &copy; Muhdiatul Zannah 2025</span>
+                    <div class="copyright customer-footer-copyright">
+                        <span class="small">Copyright &copy; Hafid Yahya {{ date('Y') }}</span>
                     </div>
                     <div class="mt-2">
-                        <span class="small" style="color: #cccccc;">Jl. Wisma Lantana IV No.D07-No 49, RT.006/RW.011,
-                            Gembor, Kec. Periuk, Kota Tangerang, Banten 15133</span>
+                        <span class="customer-footer-details small">Layanan peminjaman lapangan badminton.
+                            Aplikasi pemesanan dan pengelolaan lapangan.</span>
                     </div>
                 </div>
             </div>

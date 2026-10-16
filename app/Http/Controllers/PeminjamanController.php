@@ -6,10 +6,15 @@ use App\Models\Customer;
 use App\Models\HariLibur;
 use App\Models\JamOperasional;
 use App\Models\Lapangan;
+use App\Models\Order;
 use App\Models\Peminjaman;
+use App\Services\PakasirService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use SweetAlert2\Laravel\Swal;
 
 class PeminjamanController extends Controller
@@ -23,68 +28,159 @@ class PeminjamanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'lapangan_id' => 'required|integer|exists:lapangan,l_id',
             'jam_booking' => 'required|array|min:1',
-            'jam_booking.*' => 'required',
-            'tanggal_booking' => 'required|date',
-            'payment_method' => 'required',
+            'jam_booking.*' => 'required|date_format:H:i|distinct',
+            'tanggal_booking' => 'required|date_format:Y-m-d|after_or_equal:today',
+            'payment_method' => 'required|in:qris',
         ]);
-        $jam = $request->jam_booking;
-
-        if (!$this->isJamBerurutan($jam)) {
-            Swal::fire([
-                'icon' => 'error',
-                'title' => 'Jam Tidak Berurutan',
-                'text' => 'Jam yang dipilih harus berurutan. Contoh: 08:00, 09:00, 10:00',
-            ]);
-            return back();
-        }
-        $jamBooking = $request->jam_booking; // ['08:00','09:00','10:00']
-
-        sort($jamBooking);
-
         $jamBooking = collect($request->jam_booking)->sort()->values();
+
+        if (!$this->isJamBerurutan($jamBooking->all())) {
+            throw ValidationException::withMessages([
+                'jam_booking' => 'Jam yang dipilih harus berurutan, misalnya 08:00, 09:00, 10:00.',
+            ]);
+        }
 
         $jamMulai = Carbon::createFromFormat(
             'Y-m-d H:i',
-            $request->tanggal_booking . ' ' . $jamBooking->first()
+            $request->tanggal_booking . ' ' . $jamBooking->first(),
+            config('app.timezone')
         );
 
         $jamSelesai = Carbon::createFromFormat(
             'Y-m-d H:i',
-            $request->tanggal_booking . ' ' . $jamBooking->last()
+            $request->tanggal_booking . ' ' . $jamBooking->last(),
+            config('app.timezone')
         )->addHour();
 
-
         $totalJam = count($jamBooking);
-        $totalHarga = $request->harga_per_jam * $totalJam;
+        $tanggal = Carbon::parse($request->tanggal_booking, config('app.timezone'));
+        $customerId = Auth::guard('customer')->id();
 
-        $orderId = DB::table('peminjaman')->insertGetId([
-            'p_customer_id' => $request->customer_id,
-            'p_lapangan_id' => $request->lapangan_id,
-            'p_harga_per_jam' => $request->harga_per_jam,
-            'p_diskon' => null,
-            'p_total_harga' => $totalHarga,
-            'p_fee' => 0,
-            'p_total_payment' => $totalHarga,
-            'p_tanggal' => $request->tanggal_booking,
-            'p_jam_mulai' => $jamMulai,
-            'p_jam_selesai' => $jamSelesai,
-            'p_total_jam' => $totalJam,
-            'p_payment_method' => $request->payment_method,
-            'p_payment_number' => null,
-            'p_expired_at' => null,
-            'p_completed_at' => null,
-            'p_alasan_cancel' => null,
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+        $booking = DB::transaction(function () use ($request, $jamBooking, $jamMulai, $jamSelesai, $totalJam, $tanggal, $customerId) {
+            $this->expirePendingBookings();
+
+            // Lock the court row so simultaneous requests cannot reserve the same time range.
+            $lapangan = Lapangan::where('l_id', $request->lapangan_id)->lockForUpdate()->firstOrFail();
+            if ($lapangan->l_status !== 'active') {
+                throw ValidationException::withMessages(['lapangan_id' => 'Lapangan ini sedang tidak tersedia.']);
+            }
+
+            [$jamBuka, $jamTutup] = $this->getOperationalHours($tanggal);
+            foreach ($jamBooking as $slot) {
+                if ($slot < $jamBuka || $slot >= $jamTutup) {
+                    throw ValidationException::withMessages(['jam_booking' => 'Jam yang dipilih berada di luar jam operasional.']);
+                }
+            }
+
+            $conflict = Peminjaman::where('p_lapangan_id', $lapangan->l_id)
+                ->whereDate('p_tanggal', $tanggal->toDateString())
+                ->whereIn('p_status', ['PENDING', 'DIBAYAR', 'RUNNING'])
+                ->where('p_jam_mulai', '<', $jamSelesai)
+                ->where('p_jam_selesai', '>', $jamMulai)
+                ->exists();
+
+            if ($conflict) {
+                throw ValidationException::withMessages(['jam_booking' => 'Salah satu jam yang dipilih sudah dipesan. Silakan pilih jam lain.']);
+            }
+
+            $hargaPerJam = (int) round((float) $lapangan->l_harga);
+            $totalHarga = $hargaPerJam * $totalJam;
+            if ($totalHarga < 500 || $totalHarga > 10_000_000) {
+                throw ValidationException::withMessages([
+                    'jam_booking' => 'Total transaksi QRIS harus antara Rp500 dan Rp10.000.000.',
+                ]);
+            }
+            $booking = Peminjaman::create([
+                'p_customer_id' => $customerId,
+                'p_lapangan_id' => $lapangan->l_id,
+                'p_harga_per_jam' => $hargaPerJam,
+                'p_diskon' => null,
+                'p_total_harga' => $totalHarga,
+                'p_tanggal' => $tanggal->toDateString(),
+                'p_jam_mulai' => $jamMulai,
+                'p_jam_selesai' => $jamSelesai,
+                'p_total_jam' => $totalJam,
+                'p_alasan_cancel' => null,
+            ]);
+
+            $slug = config('services.pakasir.slug');
+            if (!$slug) {
+                throw new \RuntimeException('Konfigurasi proyek Pakasir belum lengkap.');
+            }
+
+            $booking->orders()->create([
+                'order_id' => 'BD-' . Str::upper((string) Str::uuid()),
+                'project_slug' => $slug,
+                'is_sandbox' => (bool) config('services.pakasir.is_sandbox'),
+                'payment_method' => $request->payment_method,
+                'amount' => $totalHarga,
+                'fee' => 0,
+                'total_payment' => $totalHarga,
+                'status' => 'initiating',
+            ]);
+
+            return $booking;
+        }, 3);
+
         Swal::fire([
             'icon' => 'success',
             'title' => 'Pemesanan Berhasil',
-            'text' => 'Silahkan selesaikan pembayaran dan cek riwayat pemesanan untuk melihat status pemesanan anda',
+            'text' => 'Silakan selesaikan pembayaran untuk mengonfirmasi pemesanan Anda.',
             'showConfirmButton' => true,
         ]);
-        return redirect()->route('payment', ['id' => $orderId]);
+        return redirect()->route('payment', ['id' => $booking->p_id]);
+    }
+
+    private function getOperationalHours(Carbon $tanggal): array
+    {
+        $days = [
+            'Monday' => 'Senin',
+            'Tuesday' => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis',
+            'Friday' => 'Jumat',
+            'Saturday' => 'Sabtu',
+            'Sunday' => 'Minggu',
+        ];
+        $hari = $days[$tanggal->format('l')];
+        $libur = HariLibur::where('is_active', 1)
+            ->whereDate('hl_tanggal_mulai', '<=', $tanggal)
+            ->whereDate('hl_tanggal_selesai', '>=', $tanggal)
+            ->exists();
+        $operasional = JamOperasional::where('jo_hari', $hari)->first();
+
+        if ($libur || !$operasional || $operasional->jo_is_hari_libur) {
+            throw ValidationException::withMessages(['tanggal_booking' => 'Lapangan tidak beroperasi pada tanggal yang dipilih.']);
+        }
+
+        return [substr($operasional->jo_jam_buka, 0, 5), substr($operasional->jo_jam_tutup, 0, 5)];
+    }
+
+    private function expirePendingBookings(): void
+    {
+        DB::transaction(function () {
+            $expiredBookingIds = Order::whereIn('status', ['legacy', 'pending'])
+                ->whereNull('pakasir_txn_id')
+                ->whereNotNull('expires_at')
+                ->where('expires_at', '<=', Carbon::now())
+                ->pluck('peminjaman_id');
+
+            if ($expiredBookingIds->isEmpty()) {
+                return;
+            }
+
+            Order::whereIn('peminjaman_id', $expiredBookingIds)
+                ->whereIn('status', ['legacy', 'pending'])
+                ->whereNull('pakasir_txn_id')
+                ->where('expires_at', '<=', Carbon::now())
+                ->update(['status' => 'canceled', 'updated_at' => now()]);
+
+            Peminjaman::whereIn('p_id', $expiredBookingIds)
+                ->where('p_status', 'PENDING')
+                ->update(['p_status' => 'EXPIRED', 'updated_at' => now()]);
+        }, 3);
     }
 
     public function checkJam(Request $request)
@@ -94,11 +190,7 @@ class PeminjamanController extends Controller
             'lapangan_id' => 'required'
         ]);
 
-        // Auto-expire transaksi pending yang sudah lewat batas waktu
-        Peminjaman::where('p_status', 'PENDING')
-            ->whereNotNull('p_expired_at')
-            ->where('p_expired_at', '<=', Carbon::now())
-            ->update(['p_status' => 'EXPIRED']);
+        $this->expirePendingBookings();
 
         $tanggal = Carbon::parse($request->tanggal);
 
@@ -134,7 +226,7 @@ class PeminjamanController extends Controller
         $jamTerbooking = [];
 
         $peminjaman = Peminjaman::where('p_lapangan_id', $request->lapangan_id)
-            ->whereIn('p_status', ['PENDING', 'RUNNING'])
+            ->whereIn('p_status', ['PENDING', 'DIBAYAR', 'RUNNING'])
             ->whereDate('p_tanggal', $tanggal)
             ->get();
 
@@ -179,12 +271,12 @@ class PeminjamanController extends Controller
     public function riwayat($id)
     {
         // Auto-expire transaksi pending yang sudah lewat batas waktu
-        Peminjaman::where('p_status', 'PENDING')
-            ->whereNotNull('p_expired_at')
-            ->where('p_expired_at', '<=', Carbon::now())
-            ->update(['p_status' => 'EXPIRED']);
+        $this->expirePendingBookings();
 
-        $peminjaman = Peminjaman::with(['customer', 'lapangan'])->where('p_customer_id', $id)->orderBy('created_at', 'desc')->paginate(10);
+        $peminjaman = Peminjaman::with(['customer', 'lapangan', 'latestOrder'])
+            ->where('p_customer_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
         return view('pages.customer.riwayat', compact('peminjaman'));
     }
     public function cancel(Request $request, $id)
@@ -196,7 +288,9 @@ class PeminjamanController extends Controller
             'alasan_cancel.min' => 'Minimal 5 karakter'
         ]);
 
-        $peminjaman = Peminjaman::where('p_id', $id)
+        $peminjaman = Peminjaman::with('latestOrder')
+            ->where('p_id', $id)
+            ->where('p_customer_id', Auth::guard('customer')->id())
             ->whereIn('p_status', ['PENDING', 'RUNNING'])
             ->firstOrFail();
 
@@ -215,9 +309,40 @@ class PeminjamanController extends Controller
             return redirect()->route('riwayat.booking', $peminjaman->p_customer_id);
         }
 
-        $peminjaman->p_status = 'CANCEL';
-        $peminjaman->p_alasan_cancel = $request->alasan_cancel;
-        $peminjaman->save();
+        $order = $peminjaman->latestOrder;
+        if ($order && $order->status === 'pending' && $order->pakasir_txn_id) {
+            try {
+                app(PakasirService::class)->cancelTransaction($order);
+            } catch (\Throwable $exception) {
+                report($exception);
+                Swal::fire([
+                    'icon' => 'error',
+                    'title' => 'Pembatalan gagal',
+                    'text' => 'Transaksi pembayaran belum berhasil dibatalkan. Silakan coba kembali.',
+                ]);
+
+                return redirect()->route('riwayat.booking', $peminjaman->p_customer_id);
+            }
+        }
+
+        DB::transaction(function () use ($peminjaman, $request, $order) {
+            $lockedBooking = Peminjaman::whereKey($peminjaman->p_id)->lockForUpdate()->firstOrFail();
+            if (!in_array($lockedBooking->p_status, ['PENDING', 'RUNNING'], true)) {
+                return;
+            }
+
+            if ($order) {
+                $lockedOrder = Order::whereKey($order->id)->lockForUpdate()->first();
+                if ($lockedOrder && $lockedOrder->status === 'pending') {
+                    $lockedOrder->update(['status' => 'canceled']);
+                }
+            }
+
+            $lockedBooking->update([
+                'p_status' => 'CANCEL',
+                'p_alasan_cancel' => $request->alasan_cancel,
+            ]);
+        }, 3);
 
         Swal::fire([
             'icon' => 'success',
@@ -234,10 +359,7 @@ class PeminjamanController extends Controller
     public function transaksi(Request $request)
     {
         // Auto-expire transaksi pending yang sudah lewat batas waktu
-        Peminjaman::where('p_status', 'PENDING')
-            ->whereNotNull('p_expired_at')
-            ->where('p_expired_at', '<=', Carbon::now())
-            ->update(['p_status' => 'EXPIRED']);
+        $this->expirePendingBookings();
 
         $peminjaman = Peminjaman::with(['customer', 'lapangan'])
             ->when($request->p_status, function ($q) use ($request) {

@@ -1,100 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <link rel="stylesheet" href="{{ asset("css/style.css") }}" />
+<html lang="id">
 
-        <title>Login</title>
-    </head>
-    <body class="bg-admin-login">
-        <div class="container py-5">
-            <div class="card p-0 overflow-hidden border border-white">
-                <div class="row align-items-center g-0">
-                    <div class="col-lg-6 d-none d-lg-block">
-                        <img
-                            src="{{ asset("assets/image-login.png") }}"
-                            alt="Login Image"
-                            class="img-fluid w-100 h-100"
-                            style="object-fit: cover"
-                        />
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ asset('fontawesome/css/all.min.css') }}" />
+    <title>Login Admin</title>
+</head>
+
+<body class="bg-admin-login auth-page">
+    <main class="container auth-container">
+        <section class="auth-card auth-card-admin" aria-labelledby="adminLoginTitle">
+            <div class="auth-visual" role="img" aria-label="Lapangan badminton"></div>
+            <div class="auth-panel">
+                <a class="auth-brand" href="{{ url('/') }}">BADMINTON RENTAL</a>
+                <p class="auth-eyebrow">AREA ADMINISTRATOR</p>
+                <h1 id="adminLoginTitle" class="auth-title">Selamat datang</h1>
+                <p class="auth-description">Masuk untuk mengelola pemesanan dan informasi lapangan.</p>
+
+                <form method="POST" action="{{ route('login.admin') }}" class="auth-form">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" name="username" id="username" class="form-control"
+                            placeholder="Masukkan username" autocomplete="username" value="{{ old('username') }}"
+                            required autofocus aria-describedby="usernameError" />
+                        @error('username')
+                            <p id="usernameError" class="auth-error" role="alert">{{ $message }}</p>
+                        @enderror
                     </div>
-                    <div
-                        class="form-login-admin bg-white border border-white bg-opacity-50 col-lg-6 col-md-8 col-sm-12 p-4"
-                    >
-                        <h2 class="text-center fw-bold">LOGIN</h2>
-                        <form
-                            method="POST"
-                            action="{{ route("login.admin") }}"
-                        >
-                            @csrf
-                            <div class="mb-3">
-                                <label for="username" class="mb-1">
-                                    Username
-                                </label>
-                                <input
-                                    type="text"
-                                    name="username"
-                                    id="username"
-                                    class="form-control"
-                                    placeholder="Masukan username"
-                                />
-                                @error("username")
-                                    <p class="text-danger fst-italic">
-                                        {{ $message }}
-                                    </p>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label
-                                    for="password"
-                                    class="mb-1 position-relative"
-                                >
-                                    Password
-                                </label>
-                                <input
-                                    type="password"
-                                    name="password"
-                                    id="password"
-                                    placeholder="Masukan password"
-                                    class="form-control"
-                                />
-                                @error("password")
-                                    <p class="text-danger fst-italic">
-                                        {{ $message }}
-                                    </p>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <input
-                                    type="checkbox"
-                                    name="showPassword"
-                                    id="showPassword"
-                                />
-                                <label for="showPassword">Show Password</label>
-                            </div>
-                            <div class="mb-3 d-grid text-center">
-                                <button
-                                    type="submit"
-                                    class="btn btn-light border-dark shadow rounded-pill btn-block"
-                                >
-                                    Login
-                                </button>
-                            </div>
-                        </form>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" name="password" id="password" class="form-control"
+                            placeholder="Masukkan password" autocomplete="current-password" required
+                            aria-describedby="passwordError" />
+                        @error('password')
+                            <p id="passwordError" class="auth-error" role="alert">{{ $message }}</p>
+                        @enderror
                     </div>
-                </div>
+                    <label class="auth-show-password" for="showPassword">
+                        <input type="checkbox" id="showPassword" />
+                        <span>Tampilkan password</span>
+                    </label>
+                    <button type="submit" class="btn auth-submit">
+                        Masuk <i class="fa-solid fa-arrow-right ms-2" aria-hidden="true"></i>
+                    </button>
+                </form>
             </div>
-        </div>
-        <script>
-            const password = document.getElementById('password');
-            const checkbox = document.getElementById('showPassword');
+        </section>
+    </main>
+    <script>
+        document.getElementById('showPassword').addEventListener('change', function () {
+            document.getElementById('password').type = this.checked ? 'text' : 'password';
+        });
+    </script>
+</body>
 
-            checkbox.addEventListener('change', function () {
-                password.type = this.checked ? 'text' : 'password';
-            });
-        </script>
-    </body>
 </html>

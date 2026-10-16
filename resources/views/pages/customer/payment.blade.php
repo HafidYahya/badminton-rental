@@ -8,7 +8,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <title>PEMBAYARAN - WISMA HARAPAN</title>
+    <title>PEMBAYARAN - BADMINTON RENTAL</title>
     {{-- GOOGLE FONT --}}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -364,6 +364,269 @@
                 font-size: 0.875rem;
             }
         }
+
+        .payment-page {
+            width: min(100% - 2rem, 1120px);
+            margin: 7.5rem auto 4rem;
+            padding: 1.5rem 0;
+        }
+
+        .payment-page-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-page-eyebrow,
+        .payment-section-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            margin: 0 0 .55rem;
+            color: #92600d;
+            font-size: .75rem;
+            font-weight: 800;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .payment-page-header h1 {
+            margin: 0 0 .45rem;
+            color: #202733;
+            font-size: clamp(1.7rem, 3vw, 2.35rem);
+            font-weight: 800;
+            letter-spacing: -.04em;
+        }
+
+        .payment-page-header > p:last-child {
+            max-width: 620px;
+            margin: 0;
+            color: #667085;
+            font-size: 1rem;
+        }
+
+        .payment-panel {
+            padding: clamp(1rem, 3vw, 2rem);
+            border: 1px solid #e8ebef;
+            border-radius: 24px;
+            background: #fff;
+            box-shadow: 0 24px 70px rgb(22 34 51 / 9%);
+        }
+
+        .payment-panel .panel-header {
+            align-items: flex-start;
+            padding-bottom: 1.35rem;
+            border-bottom: 1px solid #edf0f3;
+        }
+
+        .payment-panel .panel-title {
+            margin-bottom: .35rem;
+            color: #202733;
+            font-size: clamp(1.2rem, 2.5vw, 1.55rem);
+            letter-spacing: -.025em;
+        }
+
+        .payment-panel .panel-subtitle {
+            color: #667085;
+            font-size: .9rem;
+        }
+
+        .payment-panel .panel-subtitle strong {
+            color: #344054;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .payment-panel .countdown-badge {
+            flex-shrink: 0;
+            padding: .7rem .95rem;
+            border: 1px solid #f4d48b;
+            background: #fff8e8;
+            color: #80540b;
+            font-size: .85rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .payment-panel .payment-grid {
+            grid-template-columns: minmax(0, 1.05fr) minmax(300px, .95fr);
+            gap: 1.25rem;
+            padding-top: 1.35rem;
+        }
+
+        .payment-panel .qrcode-card,
+        .payment-panel .payment-details-card {
+            border: 1px solid #e9edf2;
+            border-radius: 18px;
+            background: #f8fafc;
+        }
+
+        .payment-panel .qrcode-card {
+            min-height: 100%;
+            padding: clamp(1.1rem, 3vw, 1.75rem);
+        }
+
+        .payment-panel .qrcode-card h3,
+        .payment-panel .details-heading {
+            margin: 0;
+            color: #202733;
+            font-size: 1.05rem;
+            font-weight: 750;
+        }
+
+        .payment-panel .qrcode-frame {
+            display: grid;
+            width: min(100%, 312px);
+            min-height: 312px;
+            place-items: center;
+            padding: 1rem;
+            border: 1px solid #edf0f3;
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 10px 30px rgb(22 34 51 / 6%);
+        }
+
+        .payment-panel .qrcode-frame #qrcode {
+            display: grid;
+            width: 280px;
+            max-width: 100%;
+            place-items: center;
+        }
+
+        .payment-panel .qrcode-frame #qrcode img,
+        .payment-panel .qrcode-frame #qrcode canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .payment-panel .qr-caption {
+            max-width: 340px;
+            margin: 0;
+            color: #667085;
+            font-size: .9rem;
+            line-height: 1.6;
+        }
+
+        .payment-panel .sandbox-notice {
+            max-width: 390px;
+            margin: 0;
+            padding: .7rem .85rem;
+            border: 1px solid #f5d58d;
+            border-radius: 12px;
+            background: #fff8e8;
+            color: #704b0c;
+            font-size: .82rem;
+            line-height: 1.5;
+        }
+
+        .payment-panel .payment-details-card {
+            align-content: start;
+            gap: .7rem;
+            padding: 1.25rem;
+        }
+
+        .payment-panel .amount-summary {
+            display: grid;
+            gap: .35rem;
+            margin-bottom: .25rem;
+            padding: 1.1rem 1.15rem;
+            border-radius: 14px;
+            background: #202733;
+            color: #fff;
+        }
+
+        .payment-panel .amount-summary span {
+            color: #d0d5dd;
+            font-size: .84rem;
+        }
+
+        .payment-panel .amount-summary strong {
+            color: #ffd276;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-variant-numeric: tabular-nums;
+            line-height: 1.2;
+        }
+
+        .payment-panel .detail-row {
+            padding: .85rem .9rem;
+            border-color: #e9edf2;
+        }
+
+        .payment-panel .payment-label {
+            color: #667085;
+            font-size: .85rem;
+        }
+
+        .payment-panel .payment-value {
+            color: #202733;
+            font-size: .92rem;
+        }
+
+        .payment-panel .payment-link-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: .5rem;
+            min-height: 48px;
+            margin-top: .35rem;
+            border: 0;
+            border-radius: 12px;
+            background: #f3a712;
+            color: #202733;
+            font-weight: 750;
+            text-decoration: none;
+            transition: background-color .2s ease, transform .2s ease;
+        }
+
+        .payment-panel .payment-link-button:hover {
+            transform: translateY(-1px);
+            background: #e89b08;
+            color: #202733;
+        }
+
+        .payment-panel .payment-link-button:focus-visible {
+            outline: 3px solid rgb(243 167 18 / 38%);
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 760px) {
+            .payment-page {
+                width: min(100% - 1.25rem, 560px);
+                margin-top: 6rem;
+                padding-top: .75rem;
+            }
+
+            .payment-panel .payment-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .payment-panel .panel-header {
+                align-items: flex-start;
+            }
+
+            .payment-panel .countdown-badge {
+                padding: .6rem .75rem;
+                font-size: .78rem;
+            }
+
+            .payment-panel .qrcode-frame {
+                min-height: 0;
+                aspect-ratio: 1;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .payment-panel .panel-header {
+                flex-direction: column;
+            }
+
+            .payment-panel .detail-row {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: .35rem;
+            }
+
+            .payment-panel .payment-value {
+                text-align: left;
+            }
+        }
     </style>
 </head>
 
@@ -371,11 +634,12 @@
     {{-- CONTENT --}}
     @include('components.navbar-customer-after-login')
 
-    <div class="booking-container">
-        <div class="page-header">
-            <h2><i class="fas fa-credit-card mr-2"></i>Pembayaran QRIS</h2>
+    <main class="booking-container payment-page">
+        <header class="page-header payment-page-header">
+            <p class="payment-page-eyebrow"><i class="fas fa-lock" aria-hidden="true"></i>Pembayaran aman</p>
+            <h1>Pembayaran QRIS</h1>
             <p>Scan QR code berikut dan selesaikan pembayaran sebelum kadaluarsa.</p>
-        </div>
+        </header>
 
         @if (!empty($paymentInfo))
             <div class="alert alert-info" role="alert">
@@ -389,27 +653,41 @@
             </div>
         @endif
 
-        <div class="payment-panel">
+        <section class="payment-panel" aria-label="Detail pembayaran">
             @if (
                 !empty($paymentData['payment']) &&
-                    !empty($paymentData['payment']['payment_number']) &&
-                    !empty($paymentData['payment']['expired_at']))
+                    (!empty($paymentData['payment']['qr_string']) || !empty($paymentData['payment']['payment_link']) || !empty($paymentData['payment']['va_number']))
+            )
                 <div class="panel-header">
                     <div>
-                        <h3 class="panel-title">Bayar melalui QRIS</h3>
+                        <p class="payment-section-eyebrow">Langkah terakhir</p>
+                        <h2 class="panel-title">Bayar melalui {{ strtoupper($paymentData['payment']['payment_method']) }}</h2>
                         <p class="panel-subtitle">Order ID: <strong>#{{ $paymentData['payment']['order_id'] }}</strong>
                         </p>
                     </div>
                     <div class="countdown-badge" id="paymentCountdown">
-                        Memuat waktu...
+                        <i class="far fa-clock" aria-hidden="true"></i>
+                        <span aria-live="polite">{{ !empty($paymentData['payment']['expired_at']) ? 'Memuat waktu...' : 'Masa berlaku tidak tersedia' }}</span>
                     </div>
                 </div>
 
                 <div class="payment-grid">
-                    <div class="qrcode-card">
-                        <div id="qrcode"></div>
-                    </div>
+                    @if (!empty($paymentData['payment']['qr_string']))
+                        <div class="qrcode-card">
+                            <h3>Pindai kode QRIS</h3>
+                            @if (($paymentData['payment']['is_sandbox'] ?? false) && str_contains($paymentData['payment']['qr_string'], 'placeholder'))
+                                <p class="sandbox-notice"><strong>Mode sandbox:</strong> QR ini simulasi untuk pengujian tampilan dan tidak dapat digunakan untuk pembayaran sungguhan.</p>
+                            @endif
+                            <div class="qrcode-frame"><div id="qrcode"></div></div>
+                            <p class="qr-caption">Buka aplikasi pembayaran yang mendukung QRIS, lalu arahkan kamera ke kode ini.</p>
+                        </div>
+                    @endif
                     <div class="payment-details-card">
+                        <h3 class="details-heading">Ringkasan pembayaran</h3>
+                        <div class="amount-summary">
+                            <span>Total yang perlu dibayar</span>
+                            <strong>Rp{{ number_format($paymentData['payment']['total_payment'], 0, ',', '.') }}</strong>
+                        </div>
                         <div class="detail-row">
                             <span class="payment-label">Metode Pembayaran</span>
                             <strong
@@ -425,47 +703,52 @@
                             <strong
                                 class="payment-value">Rp{{ number_format($paymentData['payment']['fee'], 0, ',', '.') }}</strong>
                         </div>
-                        <div class="detail-row">
-                            <span class="payment-label">Total Pembayaran</span>
-                            <strong
-                                class="payment-value">Rp{{ number_format($paymentData['payment']['total_payment'], 0, ',', '.') }}</strong>
-                        </div>
+                        @if (!empty($paymentData['payment']['va_number']))
+                            <div class="detail-row">
+                                <span class="payment-label">Nomor Virtual Account</span>
+                                <strong class="payment-value">{{ $paymentData['payment']['va_number'] }}</strong>
+                            </div>
+                        @endif
+                        @if (!empty($paymentData['payment']['payment_link']))
+                            <a href="{{ $paymentData['payment']['payment_link'] }}" class="payment-link-button"
+                                target="_blank" rel="noopener noreferrer">
+                                <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>Lanjutkan Pembayaran
+                            </a>
+                        @endif
                     </div>
                 </div>
             @else
                 <div class="empty-state">
                     <i class="fas fa-exclamation-circle"></i>
-                    <p>Data pembayaran tidak ditemukan atau gagal memproses transaksi. Silakan kembali dan coba lagi.
-                    </p>
+                    <p>Data pembayaran belum tersedia atau transaksi gagal diproses. Coba muat ulang untuk mencoba kembali.</p>
+                    <a href="{{ route('payment', ['id' => $paymentData['payment']['booking_id'] ?? request()->route('id')]) }}"
+                        class="btn btn-primary mt-2">
+                        <i class="fas fa-redo-alt mr-1" aria-hidden="true"></i> Coba Lagi
+                    </a>
                 </div>
             @endif
-        </div>
-    </div>
+        </section>
+    </main>
 
-    <a href="https://wa.me/6287882000678?text=Halo%20Admin,%20saya%20ingin%20bertanya" class="wa-float" target="_blank"
-        title="Chat Admin Wisma Harapan">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-    <footer class="sticky-footer mt-5"
-        style="background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); border-top: 3px solid #ffb22c;">
+    <footer class="sticky-footer customer-footer mt-5">
         <div class="container my-auto py-4">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    <h5 class="fw-bold mb-2" style="color: #ffb22c;">
-                        WISMA HARAPAN
-                        <span style="color: #ffa500; font-style: italic;">BADMINTON</span>
+                    <h5 class="customer-footer-brand fw-bold mb-2">
+                        BADMINTON RENTAL
+                        <span class="customer-footer-accent">BADMINTON</span>
                     </h5>
-                    <p class="mb-0 small" style="color: #cccccc;">
+                    <p class="customer-footer-description mb-0 small">
                         Tempat terbaik untuk bermain badminton
                     </p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <div class="copyright" style="color: #ffb22c;">
-                        <span class="small">Copyright &copy; Muhdiatul Zannah 2025</span>
+                    <div class="copyright customer-footer-copyright">
+                        <span class="small">Copyright &copy; Hafid Yahya {{ date('Y') }}</span>
                     </div>
                     <div class="mt-2">
-                        <span class="small" style="color: #cccccc;">Jl. Wisma Lantana IV No.D07-No 49, RT.006/RW.011,
-                            Gembor, Kec. Periuk, Kota Tangerang, Banten 15133</span>
+                        <span class="customer-footer-details small">Layanan peminjaman lapangan badminton.
+                            Aplikasi pemesanan dan pengelolaan lapangan.</span>
                     </div>
                 </div>
             </div>
@@ -484,18 +767,19 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const payment = @json($paymentData['payment'] ?? null);
-            if (!payment || !payment.payment_number || !payment.expired_at) {
-                const countdownEl = document.getElementById('paymentCountdown');
-                if (countdownEl) {
-                    countdownEl.textContent = 'Menunggu data pembayaran...';
+            const countdownEl = document.getElementById('paymentCountdown');
+            const countdownLabel = countdownEl?.querySelector('[aria-live="polite"]') || countdownEl;
+            if (!payment || (!payment.qr_string && !payment.payment_link && !payment.va_number)) {
+                if (countdownLabel) {
+                    countdownLabel.textContent = 'Menunggu data pembayaran...';
                 }
                 return;
             }
 
             const qrcodeElement = document.getElementById('qrcode');
-            if (qrcodeElement) {
+            if (qrcodeElement && (payment.qr_string || payment.payment_number)) {
                 new QRCode(qrcodeElement, {
-                    text: payment.payment_number,
+                    text: payment.qr_string || payment.payment_number,
                     width: 280,
                     height: 280,
                     colorDark: '#2c2c2c',
@@ -504,38 +788,27 @@
                 });
             }
 
-            const countdownEl = document.getElementById('paymentCountdown');
             const expiryTime = Number(payment.expired_at_timestamp) || Date.parse(payment.expired_at);
-            if (!countdownEl) {
-                return;
-            }
-            if (typeof expiryTime !== 'number' || isNaN(expiryTime) || expiryTime <= 0) {
-                countdownEl.textContent = 'Waktu tidak valid';
-                return;
-            }
+            if (countdownLabel && Number.isFinite(expiryTime) && expiryTime > 0) {
+                function updateCountdown() {
+                    const distance = expiryTime - Date.now();
+                    if (distance <= 0) {
+                        countdownLabel.textContent = 'Waktu habis';
+                        return;
+                    }
 
-            function updateCountdown() {
-                const now = new Date().getTime();
-                const distance = expiryTime - now;
-                if (!countdownEl) {
-                    return;
-                }
-                if (distance <= 0) {
-                    countdownEl.textContent = 'Waktu habis';
-                    return;
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    countdownLabel.textContent = `${hours}j ${minutes}m ${seconds}d`;
                 }
 
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                countdownEl.textContent = `${hours}j ${minutes}m ${seconds}d`;
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
             }
-
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
 
             // Auto-polling status pembayaran setiap 5 detik
-            const statusUrl = '{{ route('payment.status', ['id' => $paymentData['payment']['order_id'] ?? 0]) }}';
+            const statusUrl = '{{ route('payment.status', ['id' => $paymentData['payment']['booking_id'] ?? 0]) }}';
             const riwayatUrl = '{{ route('riwayat.booking', Auth::guard('customer')->id()) }}';
 
             function checkStatus() {
@@ -552,6 +825,8 @@
                             }).then(() => {
                                 window.location.href = riwayatUrl;
                             });
+                        } else if (data.order_status === 'canceled') {
+                            window.location.href = riwayatUrl;
                         }
                     })
                     .catch(() => {});

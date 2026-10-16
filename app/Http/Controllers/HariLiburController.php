@@ -4,123 +4,126 @@ namespace App\Http\Controllers;
 
 use App\Models\HariLibur;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr; // Tambahkan ini
+use Illuminate\Support\Facades\DB;
+use SweetAlert2\Laravel\Swal;
+
 
 class HariLiburController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('pages.admin.HariLibur.index');
-    }
+        // Nonaktifkan hari libur yang tanggal selesainya sudah lewat
+        HariLibur::where('is_active', true)
+            ->whereDate('hl_tanggal_selesai', '<', today())
+            ->update([
+                'is_active' => false
+            ]);
 
-    public function data()
-    {
-        $data= HariLibur::where('is_active', true)->get()->map(function($item){
-            return[
-                'id' => $item->hl_id,
-                'title' => $item->keterangan,
-                'start' => $item->hl_tanggal_mulai,
-                'end' => date('Y-m-d', strtotime($item->hl_tanggal_selesai . ' +1 day')),
-                'color' => '#dc3545',
-            ];
-        });
-        return response()->json($data);
+        // Mode edit
+        $editHariLibur = $request->filled('edit') ? HariLibur::findOrFail($request->query('edit')) : null;
+
+        $hari_libur = HariLibur::where('is_active', true)->orderBy('created_at', 'desc')->get();
+        $riwayat_hari_libur = HariLibur::where('is_active', false)->orderBy('created_at', 'desc')->get();
+        return view('pages.admin.HariLibur.index', compact('hari_libur', 'riwayat_hari_libur', 'editHariLibur'));
     }
 
     public function store(Request $request)
     {
-        try {
-            $request->validate([
-                'hl_tanggal_mulai' => 'required|date',
-                'hl_tanggal_selesai' => 'required|date|after_or_equal:hl_tanggal_mulai',
-                'keterangan' => 'required|string|max:255',
-            ],[
-                'hl_tanggal_selesai.after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai'
-            ]);
-
-            HariLibur::create([
-                'hl_tanggal_mulai' => $request->hl_tanggal_mulai,
-                'hl_tanggal_selesai' => $request->hl_tanggal_selesai,
-                'keterangan' => $request->keterangan,
-                'is_active' => true
-            ]);
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Hari libur berhasil ditambahkan'
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal: ' . implode(', ', Arr::flatten($e->errors())) 
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
-            ], 500);
-        }
+        DB::table('hari_libur')->insert([
+            'hl_tanggal_mulai' => $request->tanggal_mulai,
+            'hl_tanggal_selesai' => $request->tanggal_selesai,
+            'keterangan' => $request->keterangan,
+            'created_at' => now(),
+            'updated_at' => now(),
+            'is_active' => true
+        ]);
+        Swal::fire([
+            'toast' => true,
+            'position' => 'top-end',
+            'icon' => 'success',
+            'title' => 'Hari libur berhasil ditambahkan',
+            'showConfirmButton' => false,
+            'timer' => 3000,
+            'timerProgressBar' => true,
+        ]);
+        return redirect()->route('hari.libur.index');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
-        try {
-            $request->validate([
-                'hl_tanggal_mulai' => 'required|date',
-                'hl_tanggal_selesai' => 'required|date|after_or_equal:hl_tanggal_mulai',
-                'keterangan' => 'required|string|max:255',
-            ],[
-                'hl_tanggal_selesai.after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai'
-            ]);
+        $hari_libur = HariLibur::findOrFail($id);
 
-            HariLibur::findOrFail($id)->update([
-                'hl_tanggal_mulai' => $request->hl_tanggal_mulai,
-                'hl_tanggal_selesai' => $request->hl_tanggal_selesai,
-                'keterangan' => $request->keterangan,
-            ]);
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Hari libur berhasil diupdate'
-            ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak ditemukan'
-            ], 404);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal: ' . implode(', ', Arr::flatten($e->errors())) // Gunakan Arr::flatten
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
-            ], 500);
-        }
+        $hari_libur->update([
+            'hl_tanggal_mulai' => $request->tanggal_mulai,
+            'hl_tanggal_selesai' => $request->tanggal_selesai,
+            'keterangan' => $request->keterangan
+        ]);
+        Swal::fire([
+            'toast' => true,
+            'position' => 'top-end',
+            'icon' => 'success',
+            'title' => 'Data hari libur berhasil diubah',
+            'showConfirmButton' => false,
+            'timer' => 3000,
+            'timerProgressBar' => true,
+        ]);
+
+        return redirect()->back();
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        try {
-            $hariLibur = HariLibur::findOrFail($id);
-            $hariLibur->update(['is_active' => false]);
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Hari libur berhasil dihapus'
-            ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data tidak ditemukan'
-            ], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
-            ], 500);
-        }
+        $hari_libur = HariLibur::findOrFail($id);
+        $hari_libur->delete();
+
+        Swal::fire([
+            'toast' => true,
+            'position' => 'top-end',
+            'icon' => 'success',
+            'title' => 'Data hari libur berhasil dihapus',
+            'showConfirmButton' => false,
+            'timer' => 3000,
+            'timerProgressBar' => true,
+        ]);
+
+        return redirect()->route('hari.libur.index');
+    }
+
+    public function resolve(int $id)
+    {
+        $hari_libur = HariLibur::findOrFail($id);
+
+        $hari_libur->update(['is_active' => false]);
+
+        Swal::fire([
+            'toast' => true,
+            'position' => 'top-end',
+            'icon' => 'success',
+            'title' => 'Hari libur selesai',
+            'showConfirmButton' => false,
+            'timer' => 3000,
+            'timerProgressBar' => true,
+        ]);
+
+        return redirect()->route('hari.libur.index');
+    }
+
+    public function restore(int $id)
+    {
+        $hari_libur = HariLibur::findOrFail($id);
+
+        $hari_libur->update(['is_active' => true]);
+
+        Swal::fire([
+            'toast' => true,
+            'position' => 'top-end',
+            'icon' => 'success',
+            'title' => 'Hari libur kembali aktif',
+            'showConfirmButton' => false,
+            'timer' => 3000,
+            'timerProgressBar' => true,
+        ]);
+
+        return redirect()->route('hari.libur.index');
     }
 }

@@ -2,215 +2,246 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\Peminjaman;
+use App\Services\PakasirService;
+use App\Services\PakasirPaymentStatusService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use RuntimeException;
+use Throwable;
 
 class PaymentController extends Controller
 {
-    protected function createPaymentTransaction(Peminjaman $peminjaman)
-    {
-        try {
-            $response = Http::post(env('PAKASIR_BASE_URL') . '/transactioncreate' . '/' . $peminjaman->p_payment_method, [
-                'project'  => env('PAKASIR_PROJECT'),
-                'order_id' => (string) $peminjaman->p_id,
-                'amount'   => (int) $peminjaman->p_total_harga,
-                'api_key'  => env('API_KEY_PAKASIR'),
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Payment transaction create request failed', [
-                'order_id'       => $peminjaman->p_id,
-                'payment_method' => $peminjaman->p_payment_method,
-                'error'          => $e->getMessage(),
-            ]);
-
-            return [
-                'success' => false,
-                'error'   => 'Gagal melakukan request ke payment gateway.',
-            ];
-        }
-
-        $responseData = $response->json();
-
-        if (!isset($responseData['payment'])) {
-            return [
-                'success' => false,
-                'error'   => 'Gagal mendapatkan data pembayaran dari payment gateway.',
-            ];
-        }
-
-        $payment = $responseData['payment'];
-        $peminjaman->update([
-            'p_status'         => 'PENDING',
-            'p_fee'            => $payment['fee'] ?? 0,
-            'p_total_payment'  => $payment['total_payment'] ?? ($peminjaman->p_total_harga + ($payment['fee'] ?? 0)),
-            'p_payment_number' => $payment['payment_number'] ?? null,
-            'p_expired_at'     => isset($payment['expired_at']) ? $this->parseExpiredAt($payment['expired_at']) : null,
-        ]);
-
-        return [
-            'success'    => true,
-            'peminjaman' => $peminjaman->fresh(),
-        ];
-    }
-
-    private function parseExpiredAt(string $expiredAt)
-    {
-        return Carbon::parse($expiredAt)->setTimezone(config('app.timezone'));
+    public function __construct(
+        private readonly PakasirService $pakasir,
+        private readonly PakasirPaymentStatusService $statusSync,
+    ) {
     }
 
     public function payment($id)
     {
-        $peminjaman = Peminjaman::find($id);
-        if (!$peminjaman || $peminjaman->p_customer_id !== Auth::guard('customer')->id()) {
-            return redirect()->route('riwayat.booking', Auth::guard('customer')->id())
-                ->with('error', 'Booking tidak ditemukan.');
+        $customerId = Auth::guard('customer')->id();
+        $booking = Peminjaman::with('latestOrder')
+            ->where('p_id', $id)
+            ->where('p_customer_id', $customerId)
+            ->first();
+
+        if (!$booking) {
+            return redirect()->route('riwayat.booking', $customerId)->with('error', 'Booking tidak ditemukan.');
         }
 
-        // Cek jika sudah kedaluwarsa sebelum diproses
-        if ($peminjaman->p_status === 'PENDING' && $peminjaman->p_expired_at && Carbon::now()->greaterThan($peminjaman->p_expired_at)) {
-            $peminjaman->update(['p_status' => 'EXPIRED']);
+        if (in_array($booking->p_status, ['EXPIRED', 'CANCEL'])) {
+            return redirect()->route('riwayat.booking', $customerId)
+                ->with('error', 'Pemesanan ini sudah tidak dapat dibayar.');
         }
 
-        if ($peminjaman->p_status === 'EXPIRED') {
-            return redirect()->route('riwayat.booking', Auth::guard('customer')->id())
-                ->with('error', 'Batas waktu pembayaran telah habis. Silakan lakukan pemesanan ulang.');
+        if (in_array($booking->p_status, ['DIBAYAR', 'RUNNING', 'FINISH'])) {
+            return redirect()->route('riwayat.booking', $customerId)->with('success', 'Pembayaran sudah selesai.');
         }
 
-        if ($peminjaman->p_status === 'DIBAYAR') {
-            return redirect()->route('riwayat.booking', Auth::guard('customer')->id())
-                ->with('success', 'Pembayaran sudah selesai.');
-        }
-
-        $paymentInfo  = null;
         $paymentError = null;
+        $order = $this->getOrCreateOrder($booking);
+        $order = $this->ensureSandboxExpiry($order);
 
-        // Jika belum memiliki QR Code atau data pembayaran dari Pakasir
-        if (!$peminjaman->p_payment_number || !$peminjaman->p_expired_at) {
-            $result = $this->createPaymentTransaction($peminjaman);
-            if (!$result['success']) {
-                $paymentError = $result['error'] ?? 'Gagal memproses pembayaran.';
-            } else {
-                $peminjaman = $result['peminjaman'];
+        if ($order->status === 'pending' && $order->expires_at && $order->expires_at->isPast()) {
+            $order = $this->refreshTransactionStatus($order);
+            $booking->refresh();
+            if (in_array($booking->p_status, ['EXPIRED', 'CANCEL'])) {
+                return redirect()->route('riwayat.booking', $customerId)
+                    ->with('error', 'Batas waktu pembayaran telah habis. Silakan lakukan pemesanan ulang.');
+            }
+            if (in_array($booking->p_status, ['DIBAYAR', 'RUNNING', 'FINISH'])) {
+                return redirect()->route('riwayat.booking', $customerId)->with('success', 'Pembayaran sudah selesai.');
             }
         }
 
+        if ($order->status === 'initiating' || $order->status === 'failed') {
+            $createLock = Cache::lock('pakasir-create-' . $order->id, 20);
+            if (!$createLock->get()) {
+                $paymentError = 'Transaksi sedang diproses. Muat ulang halaman sebentar lagi.';
+            } else {
+                try {
+                    $order->refresh();
+                    if ($order->status === 'initiating' || $order->status === 'failed') {
+                        $result = $this->pakasir->createTransaction($order);
+                        if ($result['success']) {
+                            $order = $this->storeGatewayPayment($order, $result['payment']);
+                        } else {
+                            $paymentError = $result['error'];
+                            Log::warning('Pakasir rejected transaction creation', [
+                                'order_id' => $order->order_id,
+                                'http_status' => $result['http_status'] ?? null,
+                                'provider_message' => $result['error'],
+                            ]);
+                            if (!$result['retryable']) {
+                                DB::transaction(function () use ($order) {
+                                    Order::whereKey($order->id)->lockForUpdate()->update([
+                                        'status' => 'failed',
+                                        'updated_at' => now(),
+                                    ]);
+                                });
+                            }
+                        }
+                    }
+                } catch (Throwable $exception) {
+                    Log::warning('Pakasir create transaction failed', [
+                        'order_id' => $order->order_id,
+                        'exception' => $exception->getMessage(),
+                    ]);
+                    $paymentError = 'Belum dapat membuat transaksi pembayaran. Silakan coba lagi.';
+                } finally {
+                    $createLock->release();
+                }
+            }
+        }
+
+        $order->refresh();
+        $order = $this->ensureSandboxExpiry($order);
         $paymentData = [
             'payment' => [
-                'order_id'            => $peminjaman->p_id,
-                'amount'              => $peminjaman->p_total_harga,
-                'fee'                 => $peminjaman->p_fee,
-                'total_payment'       => $peminjaman->p_total_payment,
-                'payment_method'      => $peminjaman->p_payment_method,
-                'payment_number'      => $peminjaman->p_payment_number,
-                'expired_at'          => $peminjaman->p_expired_at ? $peminjaman->p_expired_at->toIso8601String() : null,
-                'expired_at_timestamp'=> $peminjaman->p_expired_at ? $peminjaman->p_expired_at->timestamp * 1000 : null,
-            ]
+                'order_id' => $order->order_id,
+                'booking_id' => $booking->p_id,
+                'amount' => $order->amount,
+                'fee' => $order->fee,
+                'total_payment' => $order->total_payment,
+                'payment_method' => $order->payment_method,
+                'payment_number' => $order->qr_string,
+                'qr_string' => $order->qr_string,
+                'payment_link' => $order->payment_link,
+                'va_number' => $order->va_number,
+                'status' => $order->status,
+                'expired_at' => $order->expires_at?->toIso8601String(),
+                'expired_at_timestamp' => $order->expires_at?->timestamp * 1000,
+                'is_sandbox' => (bool) $order->is_sandbox,
+            ],
         ];
 
-        return view('pages.customer.payment', compact('paymentData', 'paymentError', 'paymentInfo'));
+        return view('pages.customer.payment', [
+            'paymentData' => $paymentData,
+            'paymentError' => $paymentError,
+            'paymentInfo' => null,
+        ]);
+    }
+
+    private function ensureSandboxExpiry(Order $order): Order
+    {
+        if ($order->status !== 'pending' || !$order->is_sandbox || $order->expires_at) {
+            return $order;
+        }
+
+        return DB::transaction(function () use ($order) {
+            $lockedOrder = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
+            if ($lockedOrder->status === 'pending' && $lockedOrder->is_sandbox && !$lockedOrder->expires_at) {
+                // Sandbox responses may omit expiry; provide a stable local window for UI testing.
+                $lockedOrder->update(['expires_at' => now()->addMinutes(15)]);
+            }
+
+            return $lockedOrder->fresh();
+        }, 3);
+    }
+
+    private function getOrCreateOrder(Peminjaman $booking): Order
+    {
+        return DB::transaction(function () use ($booking) {
+            $lockedBooking = Peminjaman::whereKey($booking->p_id)->lockForUpdate()->firstOrFail();
+            $order = $lockedBooking->orders()->latest('id')->lockForUpdate()->first();
+
+            if ($order
+                && in_array($order->status, ['initiating', 'pending'], true)
+                && (bool) $order->is_sandbox !== (bool) config('services.pakasir.is_sandbox')) {
+                $order->update(['status' => 'canceled']);
+                $order = null;
+            }
+
+            if ($order && in_array($order->status, ['initiating', 'pending', 'completed'], true)) {
+                return $order;
+            }
+
+            $slug = config('services.pakasir.slug');
+            if (!$slug) {
+                throw new RuntimeException('Konfigurasi proyek Pakasir belum lengkap.');
+            }
+
+            return $lockedBooking->orders()->create([
+                'order_id' => 'BD-' . Str::upper((string) Str::uuid()),
+                'project_slug' => $slug,
+                'is_sandbox' => (bool) config('services.pakasir.is_sandbox'),
+                'payment_method' => $order?->payment_method ?: 'qris',
+                'amount' => (int) round((float) $lockedBooking->p_total_harga),
+                'fee' => 0,
+                'total_payment' => (int) round((float) $lockedBooking->p_total_harga),
+                'status' => 'initiating',
+            ]);
+        }, 3);
+    }
+
+    private function storeGatewayPayment(Order $order, array $payment): Order
+    {
+        return DB::transaction(function () use ($order, $payment) {
+            $lockedOrder = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
+            $booking = Peminjaman::whereKey($lockedOrder->peminjaman_id)->lockForUpdate()->firstOrFail();
+
+            if ($lockedOrder->status === 'completed') {
+                return $lockedOrder;
+            }
+
+            $fee = (int) ($payment['fee'] ?? 0);
+            $expiresAt = isset($payment['expired_at'])
+                ? Carbon::parse($payment['expired_at'])->setTimezone(config('app.timezone'))
+                : null;
+
+            $lockedOrder->update([
+                'pakasir_txn_id' => $payment['txn_id'],
+                'is_sandbox' => array_key_exists('is_sandbox', $payment)
+                    ? filter_var($payment['is_sandbox'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)
+                    : (bool) config('services.pakasir.is_sandbox'),
+                'payment_method' => $payment['payment_method'] ?? $lockedOrder->payment_method,
+                'fee' => $fee,
+                'total_payment' => (int) ($payment['total_payment'] ?? ($lockedOrder->amount + $fee)),
+                'qr_string' => $payment['qr_string'] ?? null,
+                'payment_link' => $payment['payment_link'] ?? null,
+                'va_number' => $payment['va_number'] ?? null,
+                'expires_at' => $expiresAt,
+                'status' => 'pending',
+            ]);
+
+            return $lockedOrder->fresh();
+        }, 3);
     }
 
     public function checkPaymentStatus($id)
     {
-        $peminjaman = Peminjaman::find($id);
+        $customerId = Auth::guard('customer')->id();
+        $booking = Peminjaman::with('latestOrder')
+            ->where('p_id', $id)
+            ->where('p_customer_id', $customerId)
+            ->first();
 
-        if (!$peminjaman || $peminjaman->p_customer_id !== Auth::guard('customer')->id()) {
+        if (!$booking) {
             return response()->json(['error' => 'Tidak ditemukan.'], 404);
         }
 
+        if ($booking->latestOrder && $booking->latestOrder->status === 'pending') {
+            $this->refreshTransactionStatus($booking->latestOrder);
+            $booking->refresh();
+        }
+
         return response()->json([
-            'status'       => $peminjaman->p_status,
-            'is_paid'      => $peminjaman->p_status === 'DIBAYAR',
-            'redirect_url' => route('riwayat.booking', Auth::guard('customer')->id()),
+            'status' => $booking->p_status,
+            'order_status' => $booking->latestOrder?->fresh()->status,
+            'is_paid' => in_array($booking->p_status, ['DIBAYAR', 'RUNNING', 'FINISH']),
+            'redirect_url' => route('riwayat.booking', $customerId),
         ]);
     }
 
-    public function handleWebhook(Request $request)
+    private function refreshTransactionStatus(Order $order): Order
     {
-        Log::info('Webhook Pakasir received:', $request->all());
-
-        $payload = $request->validate([
-            'amount'         => 'required|integer',
-            'order_id'       => 'required|string',
-            'project'        => 'required|string',
-            'status'         => 'required|string',
-            'payment_method' => 'required|string',
-            'completed_at'   => 'required|date',
-        ]);
-
-        if ($payload['project'] !== env('PAKASIR_PROJECT')) {
-            return response()->json(['error' => 'Project tidak valid.'], 422);
-        }
-
-        $peminjaman = Peminjaman::find($payload['order_id']);
-        if (!$peminjaman) {
-            return response()->json(['error' => 'Booking tidak ditemukan.'], 404);
-        }
-
-        if ($payload['amount'] !== (int) $peminjaman->p_total_harga && $payload['amount'] !== (int) $peminjaman->p_total_payment) {
-            return response()->json(['error' => 'Amount tidak sesuai dengan transaksi.'], 422);
-        }
-
-        $verify = $this->verifyTransactionDetail($payload['order_id'], $payload['amount']);
-        if (!$verify['success']) {
-            return response()->json(['error' => 'Verifikasi transaksi gagal.', 'detail' => $verify['error']], 422);
-        }
-
-        $transaction = $verify['transaction'];
-        if (($transaction['status'] ?? null) !== 'completed') {
-            return response()->json(['error' => 'Status transaksi belum completed.', 'status' => $transaction['status'] ?? null], 422);
-        }
-
-        if (($transaction['order_id'] ?? null) !== $payload['order_id'] || (int) ($transaction['amount'] ?? 0) !== $payload['amount']) {
-            return response()->json(['error' => 'Data transaksi tidak cocok dengan payload webhook.'], 422);
-        }
-
-        $peminjaman->update([
-            'p_status'       => 'DIBAYAR',
-            'p_completed_at' => $this->parseExpiredAt($payload['completed_at']),
-            'p_total_payment'=> $peminjaman->p_total_payment ?? $payload['amount'],
-        ]);
-
-        return response()->json(['success' => true]);
-    }
-
-    private function verifyTransactionDetail(string $orderId, int $amount): array
-    {
-        try {
-            $response = Http::get(env('PAKASIR_BASE_URL') . '/transactiondetail', [
-                'project'  => env('PAKASIR_PROJECT'),
-                'amount'   => $amount,
-                'order_id' => $orderId,
-                'api_key'  => env('API_KEY_PAKASIR'),
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Verify transaction detail failed', [
-                'order_id' => $orderId,
-                'amount'   => $amount,
-                'error'    => $e->getMessage(),
-            ]);
-
-            return [
-                'success' => false,
-                'error'   => 'Gagal menghubungi API verifikasi transaksi.',
-            ];
-        }
-
-        $responseData = $response->json();
-        if (!isset($responseData['transaction'])) {
-            return [
-                'success' => false,
-                'error'   => 'Response verifikasi tidak valid.',
-            ];
-        }
-
-        return [
-            'success'     => true,
-            'transaction' => $responseData['transaction'],
-        ];
+        return $this->statusSync->refresh($order);
     }
 }

@@ -2,51 +2,27 @@
 @section("title", "Customer")
 @section("page-heading", "Customer")
 @section("content")
-    <form method="GET">
-        <label for="status" class="form-label">
-            <i class="fas fa-filter"></i>
-            Filter
-        </label>
-        <div class="row mb-3 g-2 align-items-center">
-            <div class="col-lg-4 col-md-4 col-sm-8">
-                <select name="c_status" class="form-control" id="status">
-                    <option value="">-- Semua Status --</option>
-                    <option
-                        value="active"
-                        {{ request("c_status") == "active" ? "selected" : "" }}
-                    >
-                        AKTIF
-                    </option>
-                    <option
-                        value="inactive"
-                        {{ request("c_status") == "inactive" ? "selected" : "" }}
-                    >
-                        TIDAK AKTIF
-                    </option>
-                </select>
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-8">
-                <select name="c_is_member" class="form-control" id="member">
-                    <option value="">-- Semua Status Member --</option>
-                    <option
-                        value="Y"
-                        {{ request("c_is_member") == "Y" ? "selected" : "" }}
-                    >
-                        MEMBER
-                    </option>
-                    <option
-                        value="N"
-                        {{ request("c_is_member") == "N" ? "selected" : "" }}
-                    >
-                        BUKAN MEMBER
-                    </option>
-                </select>
-            </div>
-
-            <div class="col-lg-2 col-md-2">
-                <button class="btn btn-primary w-100">Filter</button>
-            </div>
+    <form method="GET" class="customer-filter-form">
+        <div class="customer-filter-field">
+            <label for="status" class="form-label">Status Customer</label>
+            <select name="c_status" class="form-control" id="status">
+                <option value="">Semua Status</option>
+                <option value="active" {{ request("c_status") == "active" ? "selected" : "" }}>Aktif</option>
+                <option value="inactive" {{ request("c_status") == "inactive" ? "selected" : "" }}>Tidak Aktif</option>
+            </select>
         </div>
+        <div class="customer-filter-field">
+            <label for="member" class="form-label">Status Member</label>
+            <select name="c_is_member" class="form-control" id="member">
+                <option value="">Semua Status Member</option>
+                <option value="Y" {{ request("c_is_member") == "Y" ? "selected" : "" }}>Member</option>
+                <option value="N" {{ request("c_is_member") == "N" ? "selected" : "" }}>Bukan Member</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary customer-filter-submit">
+            <i class="fas fa-filter" aria-hidden="true"></i>
+            Filter
+        </button>
     </form>
     <div class="table-responsive">
         <table class="table table-striped text-nowrap">
@@ -59,7 +35,7 @@
                     <th scope="col">Member</th>
                     <th scope="col">Status</th>
                     <th scope="col">Tanggal Daftar</th>
-                    <th scope="col">Action</th>
+                    <th scope="col">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -106,7 +82,7 @@
                         <td
                             class="fw-bold {{ $cs->c_status === "active" ? "text-success" : "text-danger" }}"
                         >
-                            {{ Str::ucfirst($cs->c_status) }}
+                            {{ $cs->c_status === "active" ? "Aktif" : "Tidak Aktif" }}
                         </td>
                         <td>
                             {{ $cs->created_at->format("d F Y") }}
@@ -114,9 +90,11 @@
                         <td>
                             <button
                                 type="button"
-                                class="btn btn-secondary btn-sm"
+                                class="btn btn-white btn-sm btn-aksi"
                                 data-bs-toggle="modal"
                                 data-bs-target="#modalDetail{{ $cs->c_id }}"
+                                aria-label="Lihat detail {{ $cs->c_nama_lengkap }}"
+                                title="Lihat detail"
                             >
                                 <i class="fa fa-fw fa-eye"></i>
                             </button>
@@ -124,14 +102,14 @@
                                 href="{{ route("customer.status", $cs->c_id) }}"
                                 class="btn btn-sm {{ $cs->c_status === "active" ? "btn-danger" : "btn-success" }}"
                             >
-                                {{ $cs->c_status === "active" ? "Deactivate Status" : "Activate Status" }}
+                                {{ $cs->c_status === "active" ? "Nonaktifkan" : "Aktifkan" }}
                             </a>
                         </td>
                     </tr>
                 @empty
                     <tr>
                         <td colspan="8" class="text-center">
-                            Belum ada data user
+                            Belum ada data customer
                         </td>
                     </tr>
                 @endforelse
@@ -168,7 +146,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                            Detail {{ $cs->cs_nama_lengkap }}
+                            Detail {{ $cs->c_nama_lengkap }}
                         </h1>
                         <button
                             type="button"

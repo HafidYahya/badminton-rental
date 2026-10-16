@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow admin-topbar">
     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" type="button"
         aria-label="Buka navigasi" aria-controls="accordionSidebar" aria-expanded="false">
         <i class="fa fa-bars" aria-hidden="true"></i>

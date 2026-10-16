@@ -26,7 +26,7 @@ Route::get('/', function () {
     // Cek apakah hari ini libur di tabel hari_libur
     $isHoliday = HariLibur::where('is_active', 1)->whereDate('hl_tanggal_mulai', '<=', $today)
         ->whereDate('hl_tanggal_selesai', '>=', $today)
-        ->exists();
+        ->first();
 
 
     $days = [
@@ -68,30 +68,45 @@ Route::middleware('admin.auth')->group(function () {
     Route::resource('user', controller: UserManagementController::class);
     Route::resource('lapangan', controller: LapanganController::class);
     Route::get('/lapangan/{id}/status', [LapanganController::class, 'status'])->name('lapangan.status');
+
+
     Route::get('/customer/{id}/activate-member', [CustomerController::class, 'activateMember'])->name('activate.member');
     Route::get('/customer/{id}/deactivate-member', [CustomerController::class, 'deactivateMember'])->name('deactivate.member');
     Route::get('customer/{id}/status', [CustomerController::class, 'status'])->name('customer.status');
     Route::get('/customer', [CustomerController::class, 'index'])->name('customer.index');
+
+
     Route::resource('jam-operasional', controller: JamOperasionalController::class)->only('index');
     Route::put('/jam-operasional/update-batch', [JamOperasionalController::class, 'updateBatch'])->name('jam-operasional.update-batch');
+
+
     Route::get('/hari-libur', [HariLiburController::class, 'index'])->name('hari.libur.index');
-    Route::get('/hari-libur/data', [HariLiburController::class, 'data']);
-    Route::post('/hari-libur', [HariLiburController::class, 'store']);
-    Route::put('/hari-libur/{id}', [HariLiburController::class, 'update']);
-    Route::delete('/hari-libur/{id}', [HariLiburController::class, 'destroy']);
+    Route::post('/hari-libur', [HariLiburController::class, 'store'])->name('hari.libur.store');
+    Route::put('/hari-libur/{id}', [HariLiburController::class, 'update'])->name('hari.libur.update');
+    Route::delete('/hari-libur/{id}', [HariLiburController::class, 'destroy'])->name('hari.libur.destroy');
+    Route::put('hari-libur/{id}/resolve', [HariLiburController::class, 'resolve'])->name('hari.libur.resolve');
+    Route::put('hari-libur/{id}/restore', [HariLiburController::class, 'restore'])->name('hari.libur.restore');
+
+
     Route::get('/admin/booking', [PeminjamanController::class, 'transaksi'])->name('transaksi.booking');
     Route::put('/booking/{id}/proses', [PeminjamanController::class, 'proses'])->name('proses.booking');
     Route::get('/users/search', [UserManagementController::class, 'search'])->name('users.search');
 });
 
+
+
 Route::middleware('customer.auth')->group(function () {
     Route::get('/profile/{id}/edit',  [CustomerController::class, 'editProfileCustomer'])->name('edit.profile.customer');
     Route::put('/profile/{customer}', [CustomerController::class, 'updateProfileCustomer'])->name('edit.profile');
+
+
     Route::put('/booking/{id}/cancel', [PeminjamanController::class, 'cancel'])->name('cancel.booking');
     Route::get('/booking/check-jam', [PeminjamanController::class, 'checkJam'])->name('booking.check-jam');
     Route::get('/booking/riwayat/{id}', [PeminjamanController::class, 'riwayat'])->name('riwayat.booking');
     Route::get('/booking/{id}', [PeminjamanController::class, 'index'])->name('booking.index');
     Route::post('/booking', [PeminjamanController::class, 'store'])->name('booking.store');
+
+
     Route::get('/payment/{id}/status', [PaymentController::class, 'checkPaymentStatus'])->name('payment.status');
     Route::get('/payment/{id}', [PaymentController::class, 'payment'])->name('payment');
 });

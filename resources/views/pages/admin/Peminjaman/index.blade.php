@@ -4,11 +4,13 @@
 
 @section('title', 'Kelola Pemesanan')
 @section('content')
-    <form method="GET">
-        <label for="status" class="form-label"><i class="fas fa-filter"></i>Status</label>
-        <div class="row mb-3 g-2 align-items-center">
-            <div class="col-lg-4 col-md-4 col-sm-8">
-                <select name="p_status" class="form-control" id="status">
+    <form method="GET" class="booking-filter-form">
+        <div class="booking-filter-field">
+            <label for="status" class="form-label">
+                <i class="fas fa-filter" aria-hidden="true"></i>
+                Status Pesanan
+            </label>
+            <select name="p_status" class="form-control" id="status">
                     <option value="">-- Semua Status --</option>
                     <option value="PENDING" {{ request('p_status') == 'PENDING' ? 'selected' : '' }}>
                         PENDING
@@ -29,16 +31,14 @@
                         EXPIRED
                     </option>
                 </select>
-            </div>
-
-            <div class="col-lg-2 col-md-2">
-                <button class="btn btn-primary w-100">Filter</button>
-            </div>
         </div>
-
+        <button type="submit" class="btn btn-primary booking-filter-submit">
+            <i class="fas fa-filter" aria-hidden="true"></i>
+            Filter
+        </button>
     </form>
     <div class="table-responsive">
-        <table class="table table-striped text-nowrap">
+        <table class="table table-striped text-nowrap align-middle">
             <thead>
                 <tr>
                     <th scope="col">No</th>
@@ -60,7 +60,7 @@
                 @forelse ($peminjaman as $booking)
                     <tr>
                         <td scope="row">{{ $peminjaman->firstItem() + $loop->index }}</td>
-                        <td>{{ $booking->customer->c_nama_lengkap }}</td>
+                        <td class="font-weight-bold">{{ $booking->customer->c_nama_lengkap }}</td>
                         <td>{{ $booking->customer->c_no_hp }}</td>
                         <td>
                             {{ $booking->lapangan->l_label }}
@@ -88,12 +88,14 @@
                         <td>{{ $booking->p_alasan_cancel ?? '-' }}</td>
                         <td>
                             @if (in_array($booking->p_status, ['DIBAYAR', 'RUNNING']))
-                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#modalProses{{ $booking->p_id }}">
+                                <button type="button" class="btn btn-white btn-sm btn-aksi" data-bs-toggle="modal"
+                                    data-bs-target="#modalProses{{ $booking->p_id }}"
+                                    aria-label="Proses pesanan {{ $booking->p_id }}" title="Proses pesanan">
                                     <i class="fa fa-fw fa-arrows-rotate"></i>
                                 </button>
                             @else
-                                <button type="button" class="btn btn-secondary btn-sm" disabled title="Tidak dapat diproses pada status ini">
+                                <button type="button" class="btn btn-white btn-sm btn-aksi" disabled
+                                    aria-label="Pesanan tidak dapat diproses" title="Tidak dapat diproses pada status ini">
                                     <i class="fa fa-fw fa-arrows-rotate"></i>
                                 </button>
                             @endif
@@ -109,25 +111,21 @@
             </tbody>
         </table>
     </div>
-    <div class="d-flex justify-content-between align-items-center mt-3">
-        <div>
-            <p class="text-muted mb-0">
-                Menampilkan {{ $peminjaman->firstItem() ?? 0 }} - {{ $peminjaman->lastItem() ?? 0 }}
-                dari {{ $peminjaman->total() }} data
-            </p>
-        </div>
-        <div>
-            {{ $peminjaman->links() }}
-        </div>
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mt-3 gap-2">
+        <p class="text-muted mb-0">
+            Menampilkan {{ $peminjaman->firstItem() ?? 0 }} - {{ $peminjaman->lastItem() ?? 0 }}
+            dari {{ $peminjaman->total() }} data
+        </p>
+        <div>{{ $peminjaman->links() }}</div>
     </div>
     @foreach ($peminjaman as $booking)
         <!-- MODAL BUKTI PEMBAYARAN-->
         <div class="modal fade" id="modalBuktiPembayaran{{ $booking->p_id }}" data-bs-backdrop="static"
-            data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalBuktiPembayaran" aria-hidden="true">
+            data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalBuktiTitle{{ $booking->p_id }}" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                        <h1 class="modal-title fs-5" id="modalBuktiTitle{{ $booking->p_id }}">
                             BUKTI PEMBAYARAN
                         </h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -150,11 +148,11 @@
         <!-- MODAL PROSES-->
 
         <div class="modal fade" id="modalProses{{ $booking->p_id }}" data-bs-backdrop="static" data-bs-keyboard="false"
-            tabindex="-1" aria-labelledby="modalProses" aria-hidden="true">
+            tabindex="-1" aria-labelledby="modalProsesTitle{{ $booking->p_id }}" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Proses</h5>
+                        <h5 class="modal-title" id="modalProsesTitle{{ $booking->p_id }}">Proses Pesanan</h5>
                     </div>
                     <div class="modal-body">
                         <form action="{{ route('proses.booking', $booking->p_id) }}" method="POST">

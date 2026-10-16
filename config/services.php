@@ -31,4 +31,11 @@ return [
         ],
     ],
 
+    'pakasir' => [
+        'base_url' => env('PAKASIR_BASE_URL', 'https://app.pakasir.com'),
+        'slug' => env('PAKASIR_SLUG', env('PAKASIR_PROJECT')),
+        'api_key' => env('PAKASIR_API_KEY'),
+        'is_sandbox' => env('PAKASIR_IS_SANDBOX', true),
+    ],
+
 ];
